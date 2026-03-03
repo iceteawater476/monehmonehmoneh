@@ -1,368 +1,931 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <meta name="description" content="MoneyFlow – Personal savings & money tracker" />
-  <meta name="theme-color" content="#0f1117" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="MoneyFlow" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
-  <title>MoneyFlow</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="MoneyFlow – Personal savings &amp; money tracker"/>
+<meta name="theme-color" content="#0e1118"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="MoneyFlow"/>
+<title>OTekka!!</title>
+<style>
+/* ── FONTS ── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap');
+
+/* ── VARIABLES ── */
+:root{
+  --f: 'DM Sans',system-ui,sans-serif;
+  --fm: 'DM Mono',monospace;
+  --sw: 220px; --th: 56px;
+  --r: 14px; --rs: 8px; --rx: 5px;
+  --ease: cubic-bezier(.4,0,.2,1);
+  --tf: 150ms var(--ease); --tm: 250ms var(--ease); --ts: 400ms var(--ease);
+}
+[data-theme="dark"]{
+  --bg:#0e1118; --bg2:#161b27; --bg3:#1e2535; --bg4:#252d3d;
+  --bd:rgba(255,255,255,.07); --bdm:rgba(255,255,255,.13);
+  --tx:#eef0f6; --tx2:#9aa3b8; --tx3:#6b7490;
+  --g:#6ee7b7; --b:#60a5fa; --p:#a78bfa; --o:#fb923c; --red:#f87171;
+  --gbg:rgba(110,231,183,.12); --bbg:rgba(96,165,250,.12);
+  --pbg:rgba(167,139,250,.12); --obg:rgba(251,146,60,.12); --rbg:rgba(248,113,113,.12);
+  --sh:0 2px 20px rgba(0,0,0,.4); --shl:0 8px 40px rgba(0,0,0,.6);
+  --st:#1a2135; --sth:#2e3f5a;
+}
+[data-theme="light"]{
+  --bg:#f2f5fb; --bg2:#fff; --bg3:#eaeff9; --bg4:#dde4f2;
+  --bd:rgba(0,0,0,.07); --bdm:rgba(0,0,0,.13);
+  --tx:#18202e; --tx2:#4a5568; --tx3:#8896af;
+  --g:#059669; --b:#2563eb; --p:#7c3aed; --o:#ea580c; --red:#dc2626;
+  --gbg:rgba(5,150,105,.1); --bbg:rgba(37,99,235,.1);
+  --pbg:rgba(124,58,237,.1); --obg:rgba(234,88,12,.1); --rbg:rgba(220,38,38,.1);
+  --sh:0 2px 16px rgba(0,0,0,.1); --shl:0 8px 32px rgba(0,0,0,.18);
+  --st:#e4eaf5; --sth:#b8c4da;
+}
+
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{font-family:var(--f);background:var(--bg);color:var(--tx);line-height:1.6;min-height:100vh;overflow-x:hidden;transition:background var(--tm),color var(--tm)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--st)}
+::-webkit-scrollbar-thumb{background:var(--sth);border-radius:99px}
+button{font-family:var(--f)}
+input,select,textarea{font-family:var(--f)}
+
+/* ── SPLASH ── */
+#splash{
+  position:fixed;inset:0;z-index:9999;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity var(--ts),visibility var(--ts);
+}
+#splash.out{opacity:0;visibility:hidden;pointer-events:none}
+.splash-logo{
+  display:flex;align-items:center;gap:14px;
+  font-size:1.7rem;font-weight:700;letter-spacing:-.5px;
+  animation:sIn .5s var(--ease) both;
+}
+@keyframes sIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+
+/* ── LAYOUT ── */
+#app{display:flex;min-height:100vh}
+.hidden{display:none!important}
+
+/* ── SIDEBAR ── */
+#sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:var(--sw);
+  background:var(--bg2);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;padding:20px 12px;z-index:100;
+  transition:transform var(--tm),background var(--tm);
+}
+.nav-brand{display:flex;align-items:center;gap:10px;padding:4px 8px 20px;font-weight:700;font-size:1.1rem;letter-spacing:-.4px}
+.nav-links{list-style:none;flex:1;display:flex;flex-direction:column;gap:3px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--rs);
+  font-size:.88rem;font-weight:500;color:var(--tx2);text-decoration:none;
+  transition:background var(--tf),color var(--tf);
+}
+.nav-item svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0}
+.nav-item:hover{background:var(--bg3);color:var(--tx)}
+.nav-item.active{background:var(--gbg);color:var(--g)}
+.nav-footer{display:flex;gap:6px;padding-top:12px;border-top:1px solid var(--bd);flex-wrap:wrap}
+
+/* ── TOPBAR ── */
+#topbar{
+  display:none;position:fixed;top:0;left:0;right:0;height:var(--th);
+  background:var(--bg2);border-bottom:1px solid var(--bd);
+  align-items:center;justify-content:space-between;padding:0 16px;z-index:101;
+}
+#pageTitle{font-weight:600;font-size:1rem}
+
+/* ── MAIN ── */
+#main{margin-left:var(--sw);flex:1;padding:28px 28px 72px;min-width:0}
+
+/* ── PAGES ── */
+.page{display:none;animation:pgIn var(--tm) var(--ease)}
+.page.active{display:block}
+@keyframes pgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.page-header h1{font-size:1.45rem;font-weight:700;letter-spacing:-.5px}
+.muted-text{color:var(--tx3);font-size:.8rem}
+
+/* ── KPI ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px;margin-bottom:18px}
+.kpi-card{
+  background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px 20px;
+  position:relative;overflow:hidden;transition:transform var(--tf),box-shadow var(--tf);
+}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r) var(--r) 0 0}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:var(--sh)}
+.ag::before{background:var(--g)}.ab::before{background:var(--b)}.ap::before{background:var(--p)}.ao::before{background:var(--o)}
+.kpi-label{font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin-bottom:6px}
+.kpi-value{font-size:1.5rem;font-weight:700;font-family:var(--fm);letter-spacing:-.5px;margin-bottom:3px}
+.ag .kpi-value{color:var(--g)}.ab .kpi-value{color:var(--b)}.ap .kpi-value{color:var(--p)}.ao .kpi-value{color:var(--o)}
+.kpi-sub{font-size:.74rem;color:var(--tx3)}
+
+/* ── CARDS ── */
+.section-card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:20px;margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.card-header h2{font-size:.95rem;font-weight:600}
+.section-card>h2{font-size:.95rem;font-weight:600;margin-bottom:12px}
+
+/* ── TABS ── */
+.tab-pills{display:flex;gap:3px;background:var(--bg3);border-radius:99px;padding:3px}
+.tab-pill{background:none;border:none;cursor:pointer;padding:5px 13px;border-radius:99px;font-size:.77rem;font-weight:500;color:var(--tx3);transition:background var(--tf),color var(--tf)}
+.tab-pill.active{background:var(--bg2);color:var(--tx);box-shadow:var(--sh)}
+
+/* ── SUMMARY ── */
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.summary-item{background:var(--bg3);border-radius:var(--rs);padding:14px;text-align:center}
+.summary-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3);margin-bottom:6px}
+.summary-value{font-size:1.15rem;font-weight:700;font-family:var(--fm)}
+.summary-item.income .summary-value{color:var(--g)}
+.summary-item.expense .summary-value{color:var(--red)}
+.summary-item.savings .summary-value{color:var(--b)}
+
+/* ── FUNDS ── */
+.funds-mini-list{display:flex;flex-direction:column;gap:7px}
+.fund-mini-item{display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--bg3);border-radius:var(--rs)}
+.fund-mini-left{display:flex;align-items:center;gap:9px;flex:1;min-width:0}
+.fund-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;flex-shrink:0}
+.fund-mini-name{font-weight:500;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fund-mini-type{font-size:.7rem;color:var(--tx3)}
+.fund-mini-bal{font-family:var(--fm);font-weight:600;font-size:.9rem;flex-shrink:0}
+.total-bar{display:flex;justify-content:space-between;align-items:center;padding-bottom:13px;margin-bottom:13px;border-bottom:1px solid var(--bd);font-weight:600}
+.total-amount{font-family:var(--fm);font-size:1.2rem;color:var(--g)}
+.funds-list{display:flex;flex-direction:column;gap:9px}
+.fund-item{display:flex;align-items:center;gap:13px;padding:13px;background:var(--bg3);border-radius:var(--rs);transition:background var(--tf)}
+.fund-item:hover{background:var(--bg4)}
+.fund-info{flex:1;min-width:0}
+.fund-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fund-meta{font-size:.75rem;color:var(--tx3);margin-top:2px}
+.fund-bal{font-family:var(--fm);font-weight:700;font-size:1rem;white-space:nowrap}
+.fund-actions{display:flex;gap:3px}
+.ft-cash{background:rgba(110,231,183,.18);color:#6ee7b7}
+.ft-bank{background:rgba(96,165,250,.18);color:#60a5fa}
+.ft-mobile{background:rgba(251,191,36,.18);color:#fbbf24}
+.ft-savings{background:rgba(167,139,250,.18);color:#a78bfa}
+.ft-investment{background:rgba(251,146,60,.18);color:#fb923c}
+.ft-crypto{background:rgba(248,113,113,.18);color:#f87171}
+.ft-other{background:rgba(156,163,175,.18);color:#9ca3af}
+
+/* ── TRANSACTIONS ── */
+.tx-list{display:flex;flex-direction:column;gap:1px}
+.tx-item{display:flex;align-items:center;gap:11px;padding:11px 9px;border-radius:var(--rs);cursor:default;transition:background var(--tf)}
+.tx-item:hover{background:var(--bg3)}
+.tx-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.tx-dot.income{background:var(--g)}.tx-dot.expense{background:var(--red)}
+.tx-info{flex:1;min-width:0}
+.tx-cat{font-weight:500;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-meta{font-size:.72rem;color:var(--tx3);display:flex;gap:5px;flex-wrap:wrap;margin-top:1px}
+.tx-meta-fund{background:var(--bg4);padding:1px 5px;border-radius:3px}
+.tx-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.tx-amt{font-family:var(--fm);font-weight:700;font-size:.92rem}
+.tx-amt.income{color:var(--g)}.tx-amt.expense{color:var(--red)}
+.tx-acts{display:flex;gap:2px}
+
+/* ── FILTERS ── */
+.filters-card{padding:14px 16px}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+.filter-row:last-child{margin-bottom:0}
+.filter-label{display:flex;align-items:center;gap:5px;font-size:.78rem;color:var(--tx3);white-space:nowrap}
+
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:48px 20px;color:var(--tx3)}
+.empty-state svg{width:38px;height:38px;stroke:currentColor;fill:none;stroke-width:1.5;margin:0 auto 10px;display:block;opacity:.35}
+
+/* ── ANALYTICS ── */
+.analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.chart-card{min-height:280px}
+.chart-wrap{width:100%;height:200px;margin-top:10px;position:relative}
+canvas{display:block}
+.analytics-summary-list{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+.asr{display:flex;justify-content:space-between;align-items:center;padding:9px 11px;background:var(--bg3);border-radius:var(--rs)}
+.asr-lbl{font-size:.84rem;color:var(--tx2)}
+.asr-val{font-family:var(--fm);font-weight:600;font-size:.88rem}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  padding:9px 17px;border-radius:var(--rs);font-family:var(--f);font-size:.875rem;font-weight:500;
+  cursor:pointer;border:none;transition:filter var(--tf),transform var(--tf);white-space:nowrap;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--g);color:#0d2518}
+[data-theme="light"] .btn-primary{color:#fff}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-ghost{background:var(--bg3);color:var(--tx2);border:1px solid var(--bd)}
+.btn-ghost:hover{background:var(--bg4)}
+.btn-danger{background:var(--rbg);color:var(--red);border:1px solid rgba(248,113,113,.25)}
+.btn-danger:hover{background:var(--red);color:#fff}
+.icon-btn{
+  width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;
+  background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;
+  color:var(--tx2);transition:background var(--tf),color var(--tf);
+}
+.icon-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8}
+.icon-btn:hover{background:var(--bg4);color:var(--tx)}
+.icon-btn.accent{background:var(--g);color:#0d2518;border-color:transparent}
+[data-theme="light"] .icon-btn.accent{color:#fff}
+.text-btn{background:none;border:none;cursor:pointer;color:var(--g);font-size:.82rem;font-weight:500;font-family:var(--f);transition:opacity var(--tf)}
+.text-btn:hover{opacity:.72}
+[data-page]{cursor:pointer}
+
+/* ── FORM ── */
+.form-label{display:flex;flex-direction:column;gap:5px;font-size:.82rem;font-weight:500;color:var(--tx2);margin-bottom:13px}
+.input-field{
+  background:var(--bg3);border:1px solid var(--bdm);border-radius:var(--rs);
+  padding:9px 11px;color:var(--tx);font-family:var(--f);font-size:.9rem;width:100%;outline:none;
+  transition:border-color var(--tf),box-shadow var(--tf);
+}
+.input-field:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(110,231,183,.13)}
+.input-field::placeholder{color:var(--tx3)}
+.select-field{
+  appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7490' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;
+}
+textarea.input-field{resize:vertical;min-height:68px}
+
+/* ── TYPE TOGGLE ── */
+.type-toggle{display:flex;margin-bottom:14px;background:var(--bg3);border-radius:var(--rs);padding:3px;gap:3px}
+.type-btn{flex:1;padding:8px;border:none;border-radius:var(--rx);font-family:var(--f);font-size:.875rem;font-weight:500;cursor:pointer;color:var(--tx3);background:none;transition:background var(--tf),color var(--tf)}
+.type-btn.active[data-type="income"]{background:var(--gbg);color:var(--g)}
+.type-btn.active[data-type="expense"]{background:var(--rbg);color:var(--red)}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);backdrop-filter:blur(4px)}
+.modal{position:fixed;inset:0;z-index:201;display:flex;align-items:center;justify-content:center;padding:16px;pointer-events:none}
+.modal.open{pointer-events:all}
+.modal-box{
+  background:var(--bg2);border:1px solid var(--bdm);border-radius:var(--r);box-shadow:var(--shl);
+  width:100%;max-width:450px;max-height:90vh;overflow-y:auto;
+  animation:mIn var(--tm) var(--ease);
+}
+.modal-box-sm{max-width:350px}
+@keyframes mIn{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:none}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:17px 20px 0}
+.modal-header h3{font-size:.98rem;font-weight:600}
+.modal-body{padding:16px 20px}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:0 20px 17px}
+
+/* ── TOAST ── */
+#toastContainer{position:fixed;bottom:18px;right:18px;display:flex;flex-direction:column;gap:7px;z-index:9998;pointer-events:none}
+.toast{
+  background:var(--bg2);border:1px solid var(--bdm);border-radius:var(--rs);padding:10px 14px;
+  font-size:.84rem;font-weight:500;box-shadow:var(--sh);
+  animation:tIn .22s var(--ease);pointer-events:all;
+  display:flex;align-items:center;gap:8px;min-width:190px;max-width:300px;
+}
+.toast-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.toast.success .toast-dot{background:var(--g)}.toast.error .toast-dot{background:var(--red)}.toast.info .toast-dot{background:var(--b)}
+@keyframes tIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+@keyframes tOut{from{opacity:1;transform:none}to{opacity:0;transform:translateX(18px)}}
+.toast.out{animation:tOut .22s var(--ease) forwards}
+
+/* ── SIDEBAR OVERLAY ── */
+#sidebarOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;display:none}
+#sidebarOverlay.on{display:block}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  #sidebar{transform:translateX(calc(-1 * var(--sw)));box-shadow:var(--shl)}
+  #sidebar.open{transform:translateX(0)}
+  #topbar{display:flex}
+  #main{margin-left:0;padding:14px 12px 80px;margin-top:var(--th)}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:9px}
+  .analytics-grid{grid-template-columns:1fr}
+  .modal-box{max-height:92vh}
+}
+@media(max-width:420px){
+  .kpi-grid{grid-template-columns:1fr}
+  .kpi-value{font-size:1.3rem}
+  .summary-value{font-size:1rem}
+}
+</style>
 </head>
 <body>
-  <!-- SPLASH -->
-  <div id="splash">
-    <div class="splash-logo">
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-        <rect width="48" height="48" rx="14" fill="url(#sg)"/>
-        <path d="M14 28c0-3.3 2.7-6 6-6h8c1.1 0 2-.9 2-2s-.9-2-2-2h-10v-4h4v-2h4v2h2c3.3 0 6 2.7 6 6s-2.7 6-6 6h-8c-1.1 0-2 .9-2 2s.9 2 2 2h10v4h-4v2h-4v-2h-2c-3.3 0-6-2.7-6-6z" fill="white"/>
-        <defs>
-          <linearGradient id="sg" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#6ee7b7"/>
-            <stop offset="1" stop-color="#3b82f6"/>
-          </linearGradient>
-        </defs>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo">
+    <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+      <rect width="48" height="48" rx="13" fill="url(#sg)"/>
+      <path d="M14 28c0-3.3 2.7-6 6-6h8c1.1 0 2-.9 2-2s-.9-2-2-2H18v-4h4v-2h4v2h2c3.3 0 6 2.7 6 6s-2.7 6-6 6h-8c-1.1 0-2 .9-2 2s.9 2 2 2h10v4h-4v2h-4v-2h-2c-3.3 0-6-2.7-6-6z" fill="white"/>
+      <defs><linearGradient id="sg" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#6ee7b7"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
+    </svg>
+    <span>MoneyFlow</span>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app" class="hidden">
+  <div id="sidebarOverlay"></div>
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="nav-brand">
+      <svg width="30" height="30" viewBox="0 0 48 48" fill="none">
+        <rect width="48" height="48" rx="12" fill="url(#sg3)"/>
+        <path d="M14 28c0-3.3 2.7-6 6-6h8c1.1 0 2-.9 2-2s-.9-2-2-2H18v-4h4v-2h4v2h2c3.3 0 6 2.7 6 6s-2.7 6-6 6h-8c-1.1 0-2 .9-2 2s.9 2 2 2h10v4h-4v2h-4v-2h-2c-3.3 0-6-2.7-6-6z" fill="white"/>
+        <defs><linearGradient id="sg3" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#6ee7b7"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
       </svg>
-      <span>MoneyFlow</span>
+      MoneyFlow
     </div>
-  </div>
-
-  <!-- APP SHELL -->
-  <div id="app" class="hidden">
-
-    <!-- SIDEBAR -->
-    <nav id="sidebar">
-      <div class="nav-brand">
-        <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
-          <rect width="48" height="48" rx="12" fill="url(#sg2)"/>
-          <path d="M14 28c0-3.3 2.7-6 6-6h8c1.1 0 2-.9 2-2s-.9-2-2-2h-10v-4h4v-2h4v2h2c3.3 0 6 2.7 6 6s-2.7 6-6 6h-8c-1.1 0-2 .9-2 2s.9 2 2 2h10v4h-4v2h-4v-2h-2c-3.3 0-6-2.7-6-6z" fill="white"/>
-          <defs>
-            <linearGradient id="sg2" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#6ee7b7"/>
-              <stop offset="1" stop-color="#3b82f6"/>
-            </linearGradient>
-          </defs>
-        </svg>
-        <span>MoneyFlow</span>
-      </div>
-      <ul class="nav-links">
-        <li><a href="#" class="nav-item active" data-page="dashboard">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-          Dashboard
-        </a></li>
-        <li><a href="#" class="nav-item" data-page="funds">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 12c0-1.7 1.3-3 3-3s3 1.3 3 3-1.3 3-3 3"/><path d="M12 7v2M12 15v2"/></svg>
-          Funds
-        </a></li>
-        <li><a href="#" class="nav-item" data-page="transactions">
-          <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/><path d="M17 15l3 3-3 3"/></svg>
-          Transactions
-        </a></li>
-        <li><a href="#" class="nav-item" data-page="analytics">
-          <svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M5 20V10l4-4 4 6 4-4v12"/></svg>
-          Analytics
-        </a></li>
-      </ul>
-      <div class="nav-footer">
-        <button id="themeToggle" class="icon-btn" title="Toggle theme">
-          <svg id="themeIconSun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          <svg id="themeIconMoon" viewBox="0 0 24 24" class="hidden"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
-        <button id="exportBtn" class="icon-btn" title="Export data">
-          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        </button>
-        <label class="icon-btn" title="Import data">
-          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10" transform="scale(1,-1) translate(0,-20)"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <input type="file" id="importFile" accept=".json" class="sr-only"/>
-        </label>
-      </div>
-    </nav>
-
-    <!-- MOBILE TOP BAR -->
-    <header id="topbar">
-      <button id="menuToggle" class="icon-btn">
-        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <ul class="nav-links">
+      <li><a href="#" class="nav-item active" data-page="dashboard">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Dashboard
+      </a></li>
+      <li><a href="#" class="nav-item" data-page="funds">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 12c0-1.7 1.3-3 3-3s3 1.3 3 3-1.3 3-3 3"/><path d="M12 7v2M12 15v2"/></svg>
+        Funds
+      </a></li>
+      <li><a href="#" class="nav-item" data-page="transactions">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/><path d="M17 15l3 3-3 3"/></svg>
+        Transactions
+      </a></li>
+      <li><a href="#" class="nav-item" data-page="analytics">
+        <svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M5 20V10l4-4 4 6 4-4v12"/></svg>
+        Analytics
+      </a></li>
+    </ul>
+    <div class="nav-footer">
+      <button id="themeToggle" class="icon-btn" title="Toggle theme">
+        <svg id="themeIconSun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg id="themeIconMoon" viewBox="0 0 24 24" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
-      <span id="pageTitle">Dashboard</span>
-      <button id="addBtnMobile" class="icon-btn accent">
-        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <button id="exportBtn" class="icon-btn" title="Export JSON">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       </button>
-    </header>
+      <label class="icon-btn" title="Import JSON" style="cursor:pointer;">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <input type="file" id="importFile" accept=".json" style="display:none"/>
+      </label>
+    </div>
+  </nav>
 
-    <!-- MAIN CONTENT -->
-    <main id="main">
-      <!-- DASHBOARD PAGE -->
-      <section id="page-dashboard" class="page active">
-        <div class="page-header desktop-only">
-          <h1>Dashboard</h1>
-          <div class="page-header-right">
-            <span id="dashLastUpdated" class="muted-text"></span>
-          </div>
-        </div>
+  <!-- MOBILE TOPBAR -->
+  <header id="topbar">
+    <button id="menuToggle" class="icon-btn">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span id="pageTitle">Dashboard</span>
+    <button id="addBtnMobile" class="icon-btn accent" style="display:none;">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </header>
 
-        <!-- KPI CARDS -->
-        <div class="kpi-grid">
-          <div class="kpi-card accent-green">
-            <div class="kpi-label">Total Assets</div>
-            <div class="kpi-value" id="kpiTotalAssets">৳0.00</div>
-            <div class="kpi-sub" id="kpiAssetCount">0 funds</div>
-          </div>
-          <div class="kpi-card accent-blue">
-            <div class="kpi-label">Total Cash</div>
-            <div class="kpi-value" id="kpiTotalCash">৳0.00</div>
-            <div class="kpi-sub">Liquid</div>
-          </div>
-          <div class="kpi-card accent-purple">
-            <div class="kpi-label">Total Invested</div>
-            <div class="kpi-value" id="kpiTotalInvested">৳0.00</div>
-            <div class="kpi-sub">Portfolio</div>
-          </div>
-          <div class="kpi-card accent-orange">
-            <div class="kpi-label">Net Balance</div>
-            <div class="kpi-value" id="kpiNetBalance">৳0.00</div>
-            <div class="kpi-sub">Income − Expenses</div>
-          </div>
-        </div>
+  <!-- PAGES -->
+  <main id="main">
 
-        <!-- SUMMARY TABS -->
-        <div class="section-card">
-          <div class="card-header">
-            <h2>Summary</h2>
-            <div class="tab-pills">
-              <button class="tab-pill active" data-period="daily">Daily</button>
-              <button class="tab-pill" data-period="weekly">Weekly</button>
-              <button class="tab-pill" data-period="monthly">Monthly</button>
-            </div>
-          </div>
-          <div class="summary-grid" id="summaryGrid">
-            <div class="summary-item income">
-              <div class="summary-label">Income</div>
-              <div class="summary-value" id="summaryIncome">৳0.00</div>
-            </div>
-            <div class="summary-item expense">
-              <div class="summary-label">Expenses</div>
-              <div class="summary-value" id="summaryExpense">৳0.00</div>
-            </div>
-            <div class="summary-item savings">
-              <div class="summary-label">Net Savings</div>
-              <div class="summary-value" id="summarySavings">৳0.00</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- FUNDS OVERVIEW -->
-        <div class="section-card">
-          <div class="card-header">
-            <h2>Funds Overview</h2>
-            <button class="text-btn" data-page="funds">See all →</button>
-          </div>
-          <div id="dashFundsList" class="funds-mini-list"></div>
-        </div>
-
-        <!-- RECENT TRANSACTIONS -->
-        <div class="section-card">
-          <div class="card-header">
-            <h2>Recent Transactions</h2>
-            <button class="text-btn" data-page="transactions">See all →</button>
-          </div>
-          <div id="dashRecentTx" class="tx-list"></div>
-        </div>
-      </section>
-
-      <!-- FUNDS PAGE -->
-      <section id="page-funds" class="page">
-        <div class="page-header">
-          <h1>Funds</h1>
-          <button class="btn btn-primary" id="addFundBtn">+ Add Fund</button>
-        </div>
-        <div class="section-card">
-          <div class="total-bar">
-            <span>Combined Total</span>
-            <span class="total-amount" id="fundsTotalAmount">৳0.00</span>
-          </div>
-          <div id="fundsList" class="funds-list"></div>
-        </div>
-      </section>
-
-      <!-- TRANSACTIONS PAGE -->
-      <section id="page-transactions" class="page">
-        <div class="page-header">
-          <h1>Transactions</h1>
-          <button class="btn btn-primary" id="addTxBtn">+ Add</button>
-        </div>
-
-        <!-- FILTERS -->
-        <div class="section-card filters-card">
-          <div class="filter-row">
-            <input type="search" id="txSearch" placeholder="Search transactions…" class="input-field" />
-          </div>
-          <div class="filter-row">
-            <select id="filterCategory" class="input-field select-field">
-              <option value="">All Categories</option>
-            </select>
-            <select id="filterFund" class="input-field select-field">
-              <option value="">All Funds</option>
-            </select>
-            <select id="filterType" class="input-field select-field">
-              <option value="">All Types</option>
-              <option value="income">Income</option>
-              <option value="expense">Expense</option>
-            </select>
-          </div>
-          <div class="filter-row">
-            <label class="filter-label">From
-              <input type="date" id="filterDateFrom" class="input-field" />
-            </label>
-            <label class="filter-label">To
-              <input type="date" id="filterDateTo" class="input-field" />
-            </label>
-            <button id="clearFiltersBtn" class="btn btn-ghost">Clear</button>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div id="txList" class="tx-list"></div>
-          <div id="txEmpty" class="empty-state hidden">
-            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-            <p>No transactions found</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- ANALYTICS PAGE -->
-      <section id="page-analytics" class="page">
-        <div class="page-header">
-          <h1>Analytics</h1>
-          <div class="tab-pills">
-            <button class="tab-pill active" data-analytics="monthly">Monthly</button>
-            <button class="tab-pill" data-analytics="weekly">Weekly</button>
-            <button class="tab-pill" data-analytics="daily">Daily</button>
-          </div>
-        </div>
-
-        <div class="analytics-grid">
-          <div class="section-card chart-card">
-            <h2>Income vs Expenses</h2>
-            <canvas id="chartIncomeExpense"></canvas>
-          </div>
-          <div class="section-card chart-card">
-            <h2>Savings Trend</h2>
-            <canvas id="chartSavings"></canvas>
-          </div>
-          <div class="section-card chart-card">
-            <h2>Spending by Category</h2>
-            <canvas id="chartCategory"></canvas>
-          </div>
-          <div class="section-card">
-            <h2>Period Summary</h2>
-            <div id="analyticsSummary" class="analytics-summary-list"></div>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <!-- OVERLAY -->
-  <div id="overlay" class="overlay hidden"></div>
-
-  <!-- MODAL: ADD/EDIT FUND -->
-  <div id="modalFund" class="modal hidden">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3 id="modalFundTitle">Add Fund</h3>
-        <button class="icon-btn modal-close" data-modal="modalFund">✕</button>
+    <!-- DASHBOARD -->
+    <section id="page-dashboard" class="page active">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <span id="dashLastUpdated" class="muted-text"></span>
       </div>
-      <div class="modal-body">
-        <input type="hidden" id="fundId" />
-        <label class="form-label">Name *
-          <input type="text" id="fundName" class="input-field" placeholder="e.g. Cash, Bank, bKash" />
-        </label>
-        <label class="form-label">Type
-          <select id="fundType" class="input-field select-field">
-            <option value="cash">Cash</option>
-            <option value="bank">Bank Account</option>
-            <option value="mobile">Mobile Banking</option>
-            <option value="savings">Savings Account</option>
-            <option value="investment">Investment</option>
-            <option value="crypto">Crypto</option>
-            <option value="other">Other</option>
-          </select>
-        </label>
-        <label class="form-label">Balance *
-          <input type="number" id="fundBalance" class="input-field" placeholder="0.00" min="0" step="0.01" />
-        </label>
-        <label class="form-label">Note
-          <input type="text" id="fundNote" class="input-field" placeholder="Optional note" />
-        </label>
+      <div class="kpi-grid">
+        <div class="kpi-card ag"><div class="kpi-label">Total Assets</div><div class="kpi-value" id="kpiTotalAssets">৳0.00</div><div class="kpi-sub" id="kpiAssetCount">0 funds</div></div>
+        <div class="kpi-card ab"><div class="kpi-label">Total Cash</div><div class="kpi-value" id="kpiTotalCash">৳0.00</div><div class="kpi-sub">Liquid</div></div>
+        <div class="kpi-card ap"><div class="kpi-label">Total Invested</div><div class="kpi-value" id="kpiTotalInvested">৳0.00</div><div class="kpi-sub">Portfolio</div></div>
+        <div class="kpi-card ao"><div class="kpi-label">Net Balance</div><div class="kpi-value" id="kpiNetBalance">৳0.00</div><div class="kpi-sub">Income − Expenses</div></div>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost modal-close" data-modal="modalFund">Cancel</button>
-        <button class="btn btn-primary" id="saveFundBtn">Save Fund</button>
+      <div class="section-card">
+        <div class="card-header">
+          <h2>Summary</h2>
+          <div class="tab-pills" id="summaryTabs">
+            <button class="tab-pill active" data-period="daily">Daily</button>
+            <button class="tab-pill" data-period="weekly">Weekly</button>
+            <button class="tab-pill" data-period="monthly">Monthly</button>
+          </div>
+        </div>
+        <div class="summary-grid">
+          <div class="summary-item income"><div class="summary-label">Income</div><div class="summary-value" id="summaryIncome">৳0.00</div></div>
+          <div class="summary-item expense"><div class="summary-label">Expenses</div><div class="summary-value" id="summaryExpense">৳0.00</div></div>
+          <div class="summary-item savings"><div class="summary-label">Net Savings</div><div class="summary-value" id="summarySavings">৳0.00</div></div>
+        </div>
       </div>
+      <div class="section-card">
+        <div class="card-header"><h2>Funds Overview</h2><button class="text-btn" data-page="funds">See all →</button></div>
+        <div id="dashFundsList" class="funds-mini-list"></div>
+      </div>
+      <div class="section-card">
+        <div class="card-header"><h2>Recent Transactions</h2><button class="text-btn" data-page="transactions">See all →</button></div>
+        <div id="dashRecentTx" class="tx-list"></div>
+      </div>
+    </section>
+
+    <!-- FUNDS -->
+    <section id="page-funds" class="page">
+      <div class="page-header"><h1>Funds</h1><button class="btn btn-primary" id="addFundBtn">+ Add Fund</button></div>
+      <div class="section-card">
+        <div class="total-bar"><span>Combined Total</span><span class="total-amount" id="fundsTotalAmount">৳0.00</span></div>
+        <div id="fundsList" class="funds-list"></div>
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS -->
+    <section id="page-transactions" class="page">
+      <div class="page-header"><h1>Transactions</h1><button class="btn btn-primary" id="addTxBtn">+ Add</button></div>
+      <div class="section-card filters-card">
+        <div class="filter-row"><input type="search" id="txSearch" placeholder="Search transactions…" class="input-field"/></div>
+        <div class="filter-row">
+          <select id="filterCategory" class="input-field select-field"><option value="">All Categories</option></select>
+          <select id="filterFund" class="input-field select-field"><option value="">All Funds</option></select>
+          <select id="filterType" class="input-field select-field"><option value="">All Types</option><option value="income">Income</option><option value="expense">Expense</option></select>
+        </div>
+        <div class="filter-row">
+          <label class="filter-label">From <input type="date" id="filterDateFrom" class="input-field" style="width:auto;"/></label>
+          <label class="filter-label">To <input type="date" id="filterDateTo" class="input-field" style="width:auto;"/></label>
+          <button id="clearFiltersBtn" class="btn btn-ghost">Clear</button>
+        </div>
+      </div>
+      <div class="section-card">
+        <div id="txList" class="tx-list"></div>
+        <div id="txEmpty" class="empty-state" style="display:none;">
+          <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          <p>No transactions found</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section id="page-analytics" class="page">
+      <div class="page-header">
+        <h1>Analytics</h1>
+        <div class="tab-pills" id="analyticsTabs">
+          <button class="tab-pill active" data-analytics="monthly">Monthly</button>
+          <button class="tab-pill" data-analytics="weekly">Weekly</button>
+          <button class="tab-pill" data-analytics="daily">Daily</button>
+        </div>
+      </div>
+      <div class="analytics-grid">
+        <div class="section-card chart-card"><h2>Income vs Expenses</h2><div class="chart-wrap"><canvas id="chartIncExp"></canvas></div></div>
+        <div class="section-card chart-card"><h2>Savings Trend</h2><div class="chart-wrap"><canvas id="chartSavings"></canvas></div></div>
+        <div class="section-card chart-card"><h2>Spending by Category</h2><div class="chart-wrap"><canvas id="chartCategory"></canvas></div></div>
+        <div class="section-card"><h2>Period Summary</h2><div id="analyticsSummary" class="analytics-summary-list"></div></div>
+      </div>
+    </section>
+
+  </main>
+</div><!-- /#app -->
+
+<!-- OVERLAY -->
+<div id="overlay" class="overlay" style="display:none;"></div>
+
+<!-- MODAL: FUND -->
+<div id="modalFund" class="modal" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="modalFundTitle">Add Fund</h3><button class="icon-btn modal-close" data-modal="modalFund">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="fundId"/>
+      <label class="form-label">Name *<input type="text" id="fundName" class="input-field" placeholder="e.g. Cash, bKash, Bank"/></label>
+      <label class="form-label">Type
+        <select id="fundType" class="input-field select-field">
+          <option value="cash">Cash</option><option value="bank">Bank Account</option>
+          <option value="mobile">Mobile Banking</option><option value="savings">Savings Account</option>
+          <option value="investment">Investment</option><option value="crypto">Crypto</option><option value="other">Other</option>
+        </select>
+      </label>
+      <label class="form-label">Balance *<input type="number" id="fundBalance" class="input-field" placeholder="0.00" min="0" step="0.01"/></label>
+      <label class="form-label">Note<input type="text" id="fundNote" class="input-field" placeholder="Optional note"/></label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost modal-close" data-modal="modalFund">Cancel</button>
+      <button class="btn btn-primary" id="saveFundBtn">Save Fund</button>
     </div>
   </div>
+</div>
 
-  <!-- MODAL: ADD/EDIT TRANSACTION -->
-  <div id="modalTx" class="modal hidden">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3 id="modalTxTitle">Add Transaction</h3>
-        <button class="icon-btn modal-close" data-modal="modalTx">✕</button>
+<!-- MODAL: TRANSACTION -->
+<div id="modalTx" class="modal" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="modalTxTitle">Add Transaction</h3><button class="icon-btn modal-close" data-modal="modalTx">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="txId"/>
+      <div class="type-toggle">
+        <button class="type-btn active" data-type="income">Income</button>
+        <button class="type-btn" data-type="expense">Expense</button>
       </div>
-      <div class="modal-body">
-        <input type="hidden" id="txId" />
-        <div class="type-toggle">
-          <button class="type-btn active" data-type="income">Income</button>
-          <button class="type-btn" data-type="expense">Expense</button>
-        </div>
-        <label class="form-label">Amount *
-          <input type="number" id="txAmount" class="input-field" placeholder="0.00" min="0.01" step="0.01" />
-        </label>
-        <label class="form-label">Category *
-          <input type="text" id="txCategory" class="input-field" placeholder="e.g. Salary, Food, Rent" list="categoryList" />
-          <datalist id="categoryList"></datalist>
-        </label>
-        <label class="form-label">Fund *
-          <select id="txFund" class="input-field select-field">
-            <option value="">Select a fund…</option>
-          </select>
-        </label>
-        <label class="form-label">Date *
-          <input type="date" id="txDate" class="input-field" />
-        </label>
-        <label class="form-label">Note
-          <textarea id="txNote" class="input-field" rows="2" placeholder="Optional note"></textarea>
-        </label>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost modal-close" data-modal="modalTx">Cancel</button>
-        <button class="btn btn-primary" id="saveTxBtn">Save Transaction</button>
-      </div>
+      <label class="form-label">Amount *<input type="number" id="txAmount" class="input-field" placeholder="0.00" min="0.01" step="0.01"/></label>
+      <label class="form-label">Category *<input type="text" id="txCategory" class="input-field" placeholder="e.g. Salary, Food, Rent" list="categoryList"/><datalist id="categoryList"></datalist></label>
+      <label class="form-label">Fund *<select id="txFund" class="input-field select-field"><option value="">Select a fund…</option></select></label>
+      <label class="form-label">Date *<input type="date" id="txDate" class="input-field"/></label>
+      <label class="form-label">Note<textarea id="txNote" class="input-field" rows="2" placeholder="Optional note"></textarea></label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost modal-close" data-modal="modalTx">Cancel</button>
+      <button class="btn btn-primary" id="saveTxBtn">Save Transaction</button>
     </div>
   </div>
+</div>
 
-  <!-- MODAL: CONFIRM DELETE -->
-  <div id="modalConfirm" class="modal hidden">
-    <div class="modal-box modal-box-sm">
-      <div class="modal-header">
-        <h3>Confirm Delete</h3>
-      </div>
-      <div class="modal-body">
-        <p id="confirmMessage">Are you sure you want to delete this item?</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost modal-close" data-modal="modalConfirm">Cancel</button>
-        <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
-      </div>
+<!-- MODAL: CONFIRM -->
+<div id="modalConfirm" class="modal" style="display:none;">
+  <div class="modal-box modal-box-sm">
+    <div class="modal-header"><h3>Confirm Delete</h3></div>
+    <div class="modal-body"><p id="confirmMessage">Are you sure?</p></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost modal-close" data-modal="modalConfirm">Cancel</button>
+      <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
     </div>
   </div>
+</div>
 
-  <!-- TOAST -->
-  <div id="toastContainer"></div>
+<div id="toastContainer"></div>
 
-  <script src="app.js"></script>
+<script>
+'use strict';
+/* ===== CONFIG ===== */
+const DB_NAME='moneyflow_db',DB_VER=1,CUR='৳';
+const FT={cash:{l:'Cash',e:'💵'},bank:{l:'Bank Account',e:'🏦'},mobile:{l:'Mobile Banking',e:'📱'},savings:{l:'Savings',e:'🐖'},investment:{l:'Investment',e:'📈'},crypto:{l:'Crypto',e:'₿'},other:{l:'Other',e:'💼'}};
+const CAT_PRESET=['Salary','Freelance','Business','Bonus','Gift','Investment Return','Food','Rent','Transport','Utilities','Shopping','Healthcare','Education','Entertainment','Travel','Clothing','Savings Transfer','Other'];
+
+/* ===== DB ===== */
+let db=null;
+function initDB(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open(DB_NAME,DB_VER);
+    r.onupgradeneeded=e=>{
+      const d=e.target.result;
+      if(!d.objectStoreNames.contains('funds')){const s=d.createObjectStore('funds',{keyPath:'id',autoIncrement:true});s.createIndex('type','type',{unique:false});}
+      if(!d.objectStoreNames.contains('transactions')){const s=d.createObjectStore('transactions',{keyPath:'id',autoIncrement:true});s.createIndex('date','date',{unique:false});s.createIndex('fundId','fundId',{unique:false});s.createIndex('type','type',{unique:false});}
+      if(!d.objectStoreNames.contains('settings'))d.createObjectStore('settings',{keyPath:'key'});
+    };
+    r.onsuccess=e=>{db=e.target.result;res(db);};
+    r.onerror=e=>rej(e.target.error);
+  });
+}
+const dg=(s,k)=>new Promise((r,j)=>{const t=db.transaction(s,'readonly'),q=t.objectStore(s).get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error);});
+const dga=(s)=>new Promise((r,j)=>{const t=db.transaction(s,'readonly'),q=t.objectStore(s).getAll();q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error);});
+const dp=(s,d)=>new Promise((r,j)=>{const t=db.transaction(s,'readwrite'),q=t.objectStore(s).put(d);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error);});
+const da=(s,d)=>new Promise((r,j)=>{const t=db.transaction(s,'readwrite'),q=t.objectStore(s).add(d);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error);});
+const dd=(s,k)=>new Promise((r,j)=>{const t=db.transaction(s,'readwrite'),q=t.objectStore(s).delete(k);q.onsuccess=()=>r();q.onerror=()=>j(q.error);});
+const dc=(s)=>new Promise((r,j)=>{const t=db.transaction(s,'readwrite'),q=t.objectStore(s).clear();q.onsuccess=()=>r();q.onerror=()=>j(q.error);});
+async function gset(k,def=null){const r=await dg('settings',k);return r?r.value:def;}
+async function sset(k,v){await dp('settings',{key:k,value:v});}
+
+/* ===== STATE ===== */
+const S={funds:[],transactions:[],sumPer:'daily',anPer:'monthly',theme:'dark',delCb:null};
+
+/* ===== UTILS ===== */
+function fmt(n){return CUR+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function today(){return new Date().toISOString().slice(0,10);}
+function wkStart(d){const dt=new Date(d+'T00:00:00');dt.setDate(dt.getDate()-dt.getDay());return dt.toISOString().slice(0,10);}
+function sameDay(a,b){return a.slice(0,10)===b.slice(0,10);}
+function sameWeek(a,b){return wkStart(a)===wkStart(b);}
+function sameMon(a,b){return a.slice(0,7)===b.slice(0,7);}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function el(id){return document.getElementById(id);}
+
+/* ===== TOAST ===== */
+function toast(msg,type='success'){
+  const c=el('toastContainer'),e=document.createElement('div');
+  e.className=`toast ${type}`;e.innerHTML=`<span class="toast-dot"></span>${esc(msg)}`;
+  c.appendChild(e);
+  setTimeout(()=>{e.classList.add('out');e.addEventListener('animationend',()=>e.remove());},2800);
+}
+
+/* ===== MODAL ===== */
+function showModal(id){el(id).style.display='flex';el(id).classList.add('open');el('overlay').style.display='block';}
+function hideModal(id){el(id).style.display='none';el(id).classList.remove('open');
+  const any=['modalFund','modalTx','modalConfirm'].some(m=>el(m).style.display!=='none');
+  if(!any)el('overlay').style.display='none';}
+function hideAll(){['modalFund','modalTx','modalConfirm'].forEach(hideModal);el('overlay').style.display='none';}
+
+/* ===== NAV ===== */
+const TITLES={dashboard:'Dashboard',funds:'Funds',transactions:'Transactions',analytics:'Analytics'};
+function nav(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(a=>a.classList.remove('active'));
+  const t=el('page-'+page);if(t)t.classList.add('active');
+  document.querySelectorAll(`.nav-item[data-page="${page}"]`).forEach(a=>a.classList.add('active'));
+  el('pageTitle').textContent=TITLES[page]||page;
+  const fab=el('addBtnMobile');
+  fab.style.display=(page==='dashboard'||page==='analytics')?'none':'inline-flex';
+  if(page==='dashboard')    renderDash();
+  if(page==='funds')        renderFunds();
+  if(page==='transactions') renderTxs();
+  if(page==='analytics')    renderAnalytics();
+  closeSidebar();
+}
+function openSidebar(){el('sidebar').classList.add('open');el('sidebarOverlay').classList.add('on');}
+function closeSidebar(){el('sidebar').classList.remove('open');el('sidebarOverlay').classList.remove('on');}
+
+/* ===== THEME ===== */
+async function applyTheme(t){
+  S.theme=t;document.documentElement.setAttribute('data-theme',t);
+  el('themeIconSun').style.display=t==='dark'?'block':'none';
+  el('themeIconMoon').style.display=t==='light'?'block':'none';
+  await sset('theme',t);
+}
+async function toggleTheme(){await applyTheme(S.theme==='dark'?'light':'dark');}
+
+/* ===== LOAD ===== */
+async function loadAll(){
+  S.funds=await dga('funds');
+  S.transactions=await dga('transactions');
+  S.transactions.sort((a,b)=>b.date.localeCompare(a.date)||(b.id-a.id));
+}
+
+/* ===== DASHBOARD ===== */
+function renderDash(){
+  const{funds:F,transactions:T}=S;
+  const tot=F.reduce((s,f)=>s+Number(f.balance),0);
+  const cash=F.filter(f=>['cash','bank','mobile','savings'].includes(f.type)).reduce((s,f)=>s+Number(f.balance),0);
+  const inv=F.filter(f=>['investment','crypto'].includes(f.type)).reduce((s,f)=>s+Number(f.balance),0);
+  const inc=T.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount),0);
+  const exp=T.filter(t=>t.type==='expense').reduce((s,t)=>s+Number(t.amount),0);
+  el('kpiTotalAssets').textContent=fmt(tot);
+  el('kpiTotalCash').textContent=fmt(cash);
+  el('kpiTotalInvested').textContent=fmt(inv);
+  el('kpiNetBalance').textContent=fmt(inc-exp);
+  el('kpiAssetCount').textContent=`${F.length} fund${F.length!==1?'s':''}`;
+  el('dashLastUpdated').textContent='Updated '+new Date().toLocaleTimeString();
+  renderSum(S.sumPer);
+  el('dashFundsList').innerHTML=F.length===0?'<div style="padding:16px;color:var(--tx3);text-align:center;font-size:.85rem;">No funds yet — go to Funds to add one.</div>':F.slice(0,5).map(f=>fMiniHtml(f)).join('');
+  const rec=T.slice(0,8);
+  el('dashRecentTx').innerHTML=rec.length===0?'<div style="padding:16px;color:var(--tx3);text-align:center;font-size:.85rem;">No transactions yet.</div>':rec.map(t=>txHtml(t,true)).join('');
+}
+function renderSum(p){
+  const r=today(),txs=S.transactions.filter(t=>{
+    if(p==='daily') return sameDay(t.date,r);
+    if(p==='weekly') return sameWeek(t.date,r);
+    if(p==='monthly') return sameMon(t.date,r);
+    return false;
+  });
+  const i=txs.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount),0);
+  const x=txs.filter(t=>t.type==='expense').reduce((s,t)=>s+Number(t.amount),0);
+  el('summaryIncome').textContent=fmt(i);el('summaryExpense').textContent=fmt(x);el('summarySavings').textContent=fmt(i-x);
+}
+function fMiniHtml(f){
+  const info=FT[f.type]||FT.other;
+  return `<div class="fund-mini-item"><div class="fund-mini-left"><div class="fund-icon ft-${f.type}">${info.e}</div><div><div class="fund-mini-name">${esc(f.name)}</div><div class="fund-mini-type">${info.l}</div></div></div><div class="fund-mini-bal">${fmt(f.balance)}</div></div>`;
+}
+
+/* ===== FUNDS PAGE ===== */
+function renderFunds(){
+  const{funds:F}=S;
+  const tot=F.reduce((s,f)=>s+Number(f.balance),0);
+  el('fundsTotalAmount').textContent=fmt(tot);
+  el('fundsList').innerHTML=F.length===0?`<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 12c0-1.7 1.3-3 3-3s3 1.3 3 3-1.3 3-3 3"/></svg><p>No funds yet. Click "+ Add Fund" above.</p></div>`:
+    F.map(f=>{const info=FT[f.type]||FT.other;return`<div class="fund-item"><div class="fund-icon ft-${f.type}">${info.e}</div><div class="fund-info"><div class="fund-name">${esc(f.name)}</div><div class="fund-meta">${info.l}${f.note?' · '+esc(f.note):''}</div></div><div class="fund-bal">${fmt(f.balance)}</div><div class="fund-actions"><button class="icon-btn" onclick="editFund(${f.id})" title="Edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="icon-btn" onclick="delFundConfirm(${f.id})" title="Delete"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button></div></div>`;}).join('');
+}
+
+/* ===== FUND CRUD ===== */
+function openAddFund(){el('fundId').value='';el('fundName').value='';el('fundType').value='cash';el('fundBalance').value='';el('fundNote').value='';el('modalFundTitle').textContent='Add Fund';showModal('modalFund');}
+async function editFund(id){
+  const f=S.funds.find(x=>x.id===id);if(!f)return;
+  el('fundId').value=f.id;el('fundName').value=f.name;el('fundType').value=f.type;el('fundBalance').value=f.balance;el('fundNote').value=f.note||'';
+  el('modalFundTitle').textContent='Edit Fund';showModal('modalFund');
+}
+async function saveFund(){
+  const name=el('fundName').value.trim(),type=el('fundType').value,balance=parseFloat(el('fundBalance').value),note=el('fundNote').value.trim(),raw=el('fundId').value;
+  if(!name){toast('Fund name is required','error');return;}
+  if(isNaN(balance)||balance<0){toast('Enter a valid balance','error');return;}
+  const fund={name,type,balance,note,updatedAt:new Date().toISOString()};
+  if(raw){fund.id=parseInt(raw);await dp('funds',fund);toast('Fund updated');}
+  else{fund.createdAt=new Date().toISOString();await da('funds',fund);toast('Fund added');}
+  hideModal('modalFund');await loadAll();renderFunds();renderDash();
+}
+function delFundConfirm(id){
+  const f=S.funds.find(x=>x.id===id);if(!f)return;
+  el('confirmMessage').textContent=`Delete "${f.name}"? All associated transactions will also be removed.`;
+  S.delCb=async()=>{for(const t of S.transactions.filter(t=>t.fundId===id))await dd('transactions',t.id);await dd('funds',id);toast('Fund deleted');await loadAll();renderFunds();renderDash();};
+  showModal('modalConfirm');
+}
+
+/* ===== TRANSACTIONS ===== */
+function getFiltered(){
+  const sr=el('txSearch').value.toLowerCase(),cf=el('filterCategory').value,ff=el('filterFund').value,tf=el('filterType').value,df=el('filterDateFrom').value,dt=el('filterDateTo').value;
+  return S.transactions.filter(t=>{
+    if(sr&&!t.category.toLowerCase().includes(sr)&&!(t.note||'').toLowerCase().includes(sr))return false;
+    if(cf&&t.category!==cf)return false;
+    if(ff&&String(t.fundId)!==ff)return false;
+    if(tf&&t.type!==tf)return false;
+    if(df&&t.date<df)return false;
+    if(dt&&t.date>dt)return false;
+    return true;
+  });
+}
+function renderTxs(){
+  fillFilterDDs();
+  const txs=getFiltered(),list=el('txList'),empty=el('txEmpty');
+  if(txs.length===0){list.innerHTML='';empty.style.display='block';}
+  else{empty.style.display='none';list.innerHTML=txs.map(t=>txHtml(t,false)).join('');}
+}
+function txHtml(t,compact){
+  const fund=S.funds.find(f=>f.id===t.fundId),fn=fund?fund.name:'Unknown';
+  const acts=compact?'':`<div class="tx-acts"><button class="icon-btn" onclick="editTx(${t.id})" title="Edit"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="icon-btn" onclick="delTxConfirm(${t.id})" title="Delete"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button></div>`;
+  return `<div class="tx-item"><div class="tx-dot ${t.type}"></div><div class="tx-info"><div class="tx-cat">${esc(t.category)}</div><div class="tx-meta"><span>${t.date}</span><span class="tx-meta-fund">${esc(fn)}</span>${t.note?`<span>${esc(t.note)}</span>`:''}</div></div><div class="tx-right"><div class="tx-amt ${t.type}">${t.type==='income'?'+':'−'}${fmt(t.amount)}</div>${acts}</div></div>`;
+}
+function fillFilterDDs(){
+  const cats=[...new Set(S.transactions.map(t=>t.category))].sort();
+  const cEl=el('filterCategory'),cv=cEl.value;
+  cEl.innerHTML='<option value="">All Categories</option>'+cats.map(c=>`<option value="${esc(c)}" ${c===cv?'selected':''}>${esc(c)}</option>`).join('');
+  const fEl=el('filterFund'),fv=fEl.value;
+  fEl.innerHTML='<option value="">All Funds</option>'+S.funds.map(f=>`<option value="${f.id}" ${String(f.id)===fv?'selected':''}>${esc(f.name)}</option>`).join('');
+}
+
+/* ===== TX CRUD ===== */
+let txType='income';
+function openAddTx(){
+  txType='income';el('txId').value='';el('txAmount').value='';el('txCategory').value='';el('txNote').value='';el('txDate').value=today();el('modalTxTitle').textContent='Add Transaction';
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type==='income'));
+  fillFundSel('');fillCatDL();showModal('modalTx');
+}
+async function editTx(id){
+  const t=S.transactions.find(x=>x.id===id);if(!t)return;
+  txType=t.type;el('txId').value=t.id;el('txAmount').value=t.amount;el('txCategory').value=t.category;el('txNote').value=t.note||'';el('txDate').value=t.date;
+  el('modalTxTitle').textContent='Edit Transaction';
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===t.type));
+  fillFundSel(t.fundId);fillCatDL();showModal('modalTx');
+}
+function fillFundSel(sel){el('txFund').innerHTML='<option value="">Select a fund…</option>'+S.funds.map(f=>`<option value="${f.id}" ${f.id==sel?'selected':''}>${esc(f.name)}</option>`).join('');}
+function fillCatDL(){const all=[...new Set([...CAT_PRESET,...S.transactions.map(t=>t.category)])].sort();el('categoryList').innerHTML=all.map(c=>`<option value="${esc(c)}"></option>`).join('');}
+async function saveTx(){
+  const raw=el('txId').value,amount=parseFloat(el('txAmount').value),category=el('txCategory').value.trim(),fundId=parseInt(el('txFund').value),date=el('txDate').value,note=el('txNote').value.trim();
+  if(isNaN(amount)||amount<=0){toast('Enter a valid amount > 0','error');return;}
+  if(!category){toast('Category is required','error');return;}
+  if(!fundId){toast('Please select a fund','error');return;}
+  if(!date){toast('Date is required','error');return;}
+  const fund=S.funds.find(f=>f.id===fundId);
+  if(!fund){toast('Selected fund not found','error');return;}
+  if(raw){
+    const old=S.transactions.find(t=>t.id===parseInt(raw));
+    if(old){const of2=S.funds.find(f=>f.id===old.fundId);if(of2){let b=Number(of2.balance);if(old.type==='income')b-=Number(old.amount);else b+=Number(old.amount);await dp('funds',{...of2,balance:Math.max(0,b)});}}
+    await dp('transactions',{id:parseInt(raw),type:txType,amount,category,fundId,date,note,updatedAt:new Date().toISOString()});toast('Transaction updated');
+  } else {await da('transactions',{type:txType,amount,category,fundId,date,note,createdAt:new Date().toISOString()});toast('Transaction added');}
+  await loadAll();
+  const uf=S.funds.find(f=>f.id===fundId);
+  if(uf){let b=Number(uf.balance);if(txType==='income')b+=amount;else b-=amount;await dp('funds',{...uf,balance:Math.max(0,b)});}
+  hideModal('modalTx');await loadAll();renderTxs();renderDash();
+}
+function delTxConfirm(id){
+  const t=S.transactions.find(x=>x.id===id);if(!t)return;
+  el('confirmMessage').textContent=`Delete "${t.category}" (${fmt(t.amount)})? Fund balance will be reversed.`;
+  S.delCb=async()=>{
+    const f=S.funds.find(f=>f.id===t.fundId);
+    if(f){let b=Number(f.balance);if(t.type==='income')b-=Number(t.amount);else b+=Number(t.amount);await dp('funds',{...f,balance:Math.max(0,b)});}
+    await dd('transactions',id);toast('Transaction deleted');await loadAll();renderTxs();renderDash();
+  };
+  showModal('modalConfirm');
+}
+
+/* ===== ANALYTICS ===== */
+function renderAnalytics(){
+  const{anPer:p,transactions:T}=S,ref=today();
+  let periods=[];
+  if(p==='daily'){for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);periods.push(d.toISOString().slice(0,10));}}
+  else if(p==='weekly'){for(let i=5;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i*7);periods.push(wkStart(d.toISOString().slice(0,10)));} periods=[...new Set(periods)];}
+  else{for(let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);periods.push(d.toISOString().slice(0,7));}}
+  const labels=[],incs=[],exps=[],savs=[];
+  for(const pp of periods){
+    let pt;
+    if(p==='daily'){pt=T.filter(t=>t.date===pp);labels.push(new Date(pp+'T00:00:00').toLocaleDateString('en',{month:'short',day:'numeric'}));}
+    else if(p==='weekly'){pt=T.filter(t=>wkStart(t.date)===pp);labels.push(new Date(pp+'T00:00:00').toLocaleDateString('en',{month:'short',day:'numeric'}));}
+    else{pt=T.filter(t=>t.date.slice(0,7)===pp);labels.push(new Date(pp+'-01T00:00:00').toLocaleDateString('en',{month:'short',year:'2-digit'}));}
+    const i=pt.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount),0);
+    const x=pt.filter(t=>t.type==='expense').reduce((s,t)=>s+Number(t.amount),0);
+    incs.push(i);exps.push(x);savs.push(i-x);
+  }
+  let cur;
+  if(p==='daily')cur=T.filter(t=>t.date===ref);
+  else if(p==='weekly')cur=T.filter(t=>sameWeek(t.date,ref));
+  else cur=T.filter(t=>sameMon(t.date,ref));
+  const catM={};cur.filter(t=>t.type==='expense').forEach(t=>{catM[t.category]=(catM[t.category]||0)+Number(t.amount);});
+  const catE=Object.entries(catM).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  drawBars('chartIncExp',labels,[{label:'Income',data:incs,color:'#6ee7b7'},{label:'Expenses',data:exps,color:'#f87171'}]);
+  drawLine('chartSavings',labels,savs,'#60a5fa');
+  drawPie('chartCategory',catE.map(e=>e[0]),catE.map(e=>e[1]));
+  const ti=incs.reduce((a,b)=>a+b,0),tx=exps.reduce((a,b)=>a+b,0),ts=ti-tx;
+  el('analyticsSummary').innerHTML=`
+    <div class="asr"><span class="asr-lbl">Total Income</span><span class="asr-val" style="color:var(--g)">${fmt(ti)}</span></div>
+    <div class="asr"><span class="asr-lbl">Total Expenses</span><span class="asr-val" style="color:var(--red)">${fmt(tx)}</span></div>
+    <div class="asr"><span class="asr-lbl">Net Savings</span><span class="asr-val" style="color:var(--b)">${fmt(ts)}</span></div>
+    <div class="asr"><span class="asr-lbl">Transactions</span><span class="asr-val">${cur.length}</span></div>
+    <div class="asr"><span class="asr-lbl">Savings Rate</span><span class="asr-val">${ti>0?Math.round((ts/ti)*100):0}%</span></div>`;
+}
+
+/* ===== CHARTS ===== */
+function thC(){const s=getComputedStyle(document.documentElement);return{t2:s.getPropertyValue('--tx2').trim()||'#9aa3b8',t3:s.getPropertyValue('--tx3').trim()||'#6b7490',bd:s.getPropertyValue('--bd').trim()||'rgba(255,255,255,.07)',bg2:s.getPropertyValue('--bg2').trim()||'#161b27'};}
+function rCv(c){const p=c.parentElement;c.width=p.clientWidth;c.height=p.clientHeight;}
+function drawBars(id,labels,dsets){
+  const c=el(id);if(!c)return;rCv(c);const ctx=c.getContext('2d'),W=c.width,H=c.height,C=thC();
+  const P={t:22,r:14,b:40,l:52},cW=W-P.l-P.r,cH=H-P.t-P.b;
+  ctx.clearRect(0,0,W,H);
+  const mV=Math.max(...dsets.flatMap(d=>d.data),1),n=labels.length,gW=cW/n,bW=Math.min(gW/(dsets.length+.5),22),gap=bW*.25;
+  ctx.font='10px DM Sans,system-ui,sans-serif';
+  for(let i=0;i<=4;i++){const y=P.t+cH-(i/4)*cH,v=(mV/4)*i;ctx.strokeStyle=C.bd;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+cW,y);ctx.stroke();ctx.fillStyle=C.t3;ctx.textAlign='right';ctx.fillText(v>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0),P.l-4,y+3);}
+  dsets.forEach((ds,di)=>{ctx.fillStyle=ds.color;ds.data.forEach((v,i)=>{const bH=v>0?(v/mV)*cH:0,x=P.l+i*gW+(gW-dsets.length*(bW+gap))/2+di*(bW+gap),y=P.t+cH-bH;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x,y,bW,Math.max(bH,2),[3,3,0,0]);else ctx.rect(x,y,bW,Math.max(bH,2));ctx.fill();});});
+  ctx.fillStyle=C.t3;ctx.textAlign='center';labels.forEach((l,i)=>ctx.fillText(l,P.l+i*gW+gW/2,H-6));
+  let lx=P.l;dsets.forEach(ds=>{ctx.fillStyle=ds.color;ctx.fillRect(lx,4,9,9);ctx.fillStyle=C.t2;ctx.textAlign='left';ctx.fillText(ds.label,lx+13,12);lx+=ctx.measureText(ds.label).width+26;});
+}
+function drawLine(id,labels,data,color){
+  const c=el(id);if(!c)return;rCv(c);const ctx=c.getContext('2d'),W=c.width,H=c.height,C=thC();
+  const P={t:16,r:14,b:40,l:52},cW=W-P.l-P.r,cH=H-P.t-P.b;
+  ctx.clearRect(0,0,W,H);
+  const mn=Math.min(...data,0),mx=Math.max(...data,1),range=mx-mn||1,n=data.length;
+  ctx.font='10px DM Sans,system-ui,sans-serif';
+  for(let i=0;i<=4;i++){const y=P.t+cH-(i/4)*cH,v=mn+(range/4)*i;ctx.strokeStyle=C.bd;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+cW,y);ctx.stroke();ctx.fillStyle=C.t3;ctx.textAlign='right';ctx.fillText(v>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0),P.l-4,y+3);}
+  const pts=data.map((v,i)=>({x:P.l+(n<2?cW/2:(i/(n-1))*cW),y:P.t+cH-((v-mn)/range)*cH}));
+  const grad=ctx.createLinearGradient(0,P.t,0,P.t+cH);grad.addColorStop(0,color+'40');grad.addColorStop(1,color+'00');
+  ctx.fillStyle=grad;ctx.beginPath();ctx.moveTo(pts[0].x,P.t+cH);pts.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(pts[pts.length-1].x,P.t+cH);ctx.closePath();ctx.fill();
+  ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));ctx.stroke();
+  pts.forEach(p=>{ctx.fillStyle=color;ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=C.bg2;ctx.beginPath();ctx.arc(p.x,p.y,2,0,Math.PI*2);ctx.fill();});
+  ctx.fillStyle=C.t3;ctx.textAlign='center';labels.forEach((l,i)=>ctx.fillText(l,pts[i].x,H-6));
+}
+function drawPie(id,labels,data){
+  const c=el(id);if(!c)return;rCv(c);const ctx=c.getContext('2d'),W=c.width,H=c.height,C=thC();
+  ctx.clearRect(0,0,W,H);
+  if(!data.length||data.every(v=>v===0)){ctx.fillStyle=C.t3;ctx.font='12px DM Sans,system-ui,sans-serif';ctx.textAlign='center';ctx.fillText('No expense data for this period',W/2,H/2);return;}
+  const COLS=['#6ee7b7','#60a5fa','#a78bfa','#fb923c','#f87171','#fbbf24','#34d399','#818cf8'];
+  const tot=data.reduce((a,b)=>a+b,0),r=Math.min(W,H)*.3,cx=W*.34,cy=H/2;
+  let ang=-Math.PI/2;
+  data.forEach((v,i)=>{const sl=(v/tot)*Math.PI*2;ctx.fillStyle=COLS[i%COLS.length];ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,ang,ang+sl);ctx.closePath();ctx.fill();ang+=sl;});
+  ctx.fillStyle=C.bg2;ctx.beginPath();ctx.arc(cx,cy,r*.55,0,Math.PI*2);ctx.fill();
+  const lx=W*.63,lh=17,sy=cy-(Math.min(data.length,8)*lh)/2;
+  data.slice(0,8).forEach((v,i)=>{const y=sy+i*lh,pct=Math.round((v/tot)*100);ctx.fillStyle=COLS[i%COLS.length];ctx.fillRect(lx,y+2,8,8);ctx.fillStyle=C.t2;ctx.font='10px DM Sans,system-ui,sans-serif';ctx.textAlign='left';ctx.fillText(`${(labels[i]||'').slice(0,11)} ${pct}%`,lx+12,y+10);});
+}
+
+/* ===== EXPORT / IMPORT ===== */
+async function exportData(){
+  const data={version:'1.0',exportedAt:new Date().toISOString(),funds:S.funds,transactions:S.transactions};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`moneyflow-${today()}.json`;a.click();URL.revokeObjectURL(url);toast('Data exported');
+}
+async function importData(file){
+  try{const text=await file.text(),data=JSON.parse(text);
+    if(!data.funds||!data.transactions){toast('Invalid file format','error');return;}
+    await dc('funds');await dc('transactions');
+    for(const f of data.funds)await dp('funds',f);
+    for(const t of data.transactions)await dp('transactions',t);
+    await loadAll();renderDash();toast(`Imported ${data.funds.length} funds, ${data.transactions.length} transactions`);
+  }catch(e){toast('Import failed: '+e.message,'error');}
+}
+
+/* ===== EVENTS ===== */
+function bindEvents(){
+  document.querySelectorAll('.nav-item[data-page]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();nav(a.dataset.page);}));
+  document.querySelectorAll('[data-page]:not(.nav-item)').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.page)));
+  el('menuToggle').addEventListener('click',openSidebar);
+  el('sidebarOverlay').addEventListener('click',closeSidebar);
+  el('addBtnMobile').addEventListener('click',()=>{const active=document.querySelector('.page.active');if(active&&active.id==='page-funds')openAddFund();if(active&&active.id==='page-transactions')openAddTx();});
+  el('themeToggle').addEventListener('click',toggleTheme);
+  el('exportBtn').addEventListener('click',exportData);
+  el('importFile').addEventListener('change',e=>{if(e.target.files[0])importData(e.target.files[0]);e.target.value='';});
+  el('overlay').addEventListener('click',hideAll);
+  document.querySelectorAll('.modal-close').forEach(b=>b.addEventListener('click',()=>hideModal(b.dataset.modal)));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')hideAll();});
+  el('addFundBtn').addEventListener('click',openAddFund);
+  el('saveFundBtn').addEventListener('click',saveFund);
+  el('addTxBtn').addEventListener('click',openAddTx);
+  el('saveTxBtn').addEventListener('click',saveTx);
+  document.querySelectorAll('.type-btn').forEach(b=>b.addEventListener('click',()=>{txType=b.dataset.type;document.querySelectorAll('.type-btn').forEach(x=>x.classList.toggle('active',x.dataset.type===txType));}));
+  el('confirmDeleteBtn').addEventListener('click',async()=>{if(S.delCb){await S.delCb();S.delCb=null;}hideModal('modalConfirm');});
+  el('summaryTabs').addEventListener('click',e=>{const p=e.target.closest('.tab-pill');if(!p)return;document.querySelectorAll('#summaryTabs .tab-pill').forEach(x=>x.classList.remove('active'));p.classList.add('active');S.sumPer=p.dataset.period;renderSum(S.sumPer);});
+  el('analyticsTabs').addEventListener('click',e=>{const p=e.target.closest('.tab-pill');if(!p)return;document.querySelectorAll('#analyticsTabs .tab-pill').forEach(x=>x.classList.remove('active'));p.classList.add('active');S.anPer=p.dataset.analytics;renderAnalytics();});
+  ['txSearch','filterCategory','filterFund','filterType','filterDateFrom','filterDateTo'].forEach(id=>{el(id).addEventListener('input',renderTxs);el(id).addEventListener('change',renderTxs);});
+  el('clearFiltersBtn').addEventListener('click',()=>{['txSearch','filterCategory','filterFund','filterType','filterDateFrom','filterDateTo'].forEach(id=>el(id).value='');renderTxs();});
+  let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(document.querySelector('#page-analytics.active'))renderAnalytics();},150);});
+}
+
+/* ===== INIT ===== */
+async function init(){
+  try{
+    // Register service worker if available
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+    }
+    await initDB();
+    const t=await gset('theme','dark');
+    await applyTheme(t);
+    await loadAll();
+    bindEvents();
+    renderDash();
+  } catch(err){
+    console.error('[MoneyFlow] Init error:',err);
+    // Show error in splash so user knows something went wrong
+    const sl=document.querySelector('.splash-logo');
+    if(sl)sl.innerHTML+='<div style="font-size:.75rem;color:#f87171;margin-top:8px;">Error: '+err.message+'</div>';
+  } finally {
+    // Always hide splash — even if there's an error
+    setTimeout(()=>{
+      el('splash').classList.add('out');
+      el('app').classList.remove('hidden');
+      setTimeout(()=>{el('splash').style.display='none';},500);
+    },700);
+  }
+}
+
+// Globals for inline onclick handlers
+window.editFund=editFund;
+window.delFundConfirm=delFundConfirm;
+window.editTx=editTx;
+window.delTxConfirm=delTxConfirm;
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
 </body>
 </html>
+
