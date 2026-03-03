@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="description" content="MoneyFlow – Personal savings & money tracker" />
+  <meta name="theme-color" content="#0f1117" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MoneyFlow" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <title>MoneyFlow</title>
+</head>
+<body>
+  <!-- SPLASH -->
+  <div id="splash">
+    <div class="splash-logo">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+        <rect width="48" height="48" rx="14" fill="url(#sg)"/>
+        <path d="M14 28c0-3.3 2.7-6 6-6h8c1.1 0 2-.9 2-2s-.9-2-2-2h-10v-4h4v-2h4v2h2c3.3 0 6 2.7 6 6s-2.7 6-6 6h-8c-1.1 0-2 .9-2 2s.9 2 2 2h10v4h-4v2h-4v-2h-2c-3.3 0-6-2.7-6-6z" fill="white"/>
+        <defs>
+          <linearGradient id="sg" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#6ee7b7"/>
+            <stop offset="1" stop-color="#3b82f6"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span>MoneyFlow</span>
+    </div>
+  </div>
+
+  <!-- APP SHELL -->
+  <div id="app" class="hidden">
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div class="nav-brand">
+        <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+          <rect width="48" height="48" rx="12" fill="url(#sg2)"/>
+          <path d="M14 28c0-3.3 2.7-6 6-6h8c1.1 0 2-.9 2-2s-.9-2-2-2h-10v-4h4v-2h4v2h2c3.3 0 6 2.7 6 6s-2.7 6-6 6h-8c-1.1 0-2 .9-2 2s.9 2 2 2h10v4h-4v2h-4v-2h-2c-3.3 0-6-2.7-6-6z" fill="white"/>
+          <defs>
+            <linearGradient id="sg2" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#6ee7b7"/>
+              <stop offset="1" stop-color="#3b82f6"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span>MoneyFlow</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#" class="nav-item active" data-page="dashboard">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          Dashboard
+        </a></li>
+        <li><a href="#" class="nav-item" data-page="funds">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 12c0-1.7 1.3-3 3-3s3 1.3 3 3-1.3 3-3 3"/><path d="M12 7v2M12 15v2"/></svg>
+          Funds
+        </a></li>
+        <li><a href="#" class="nav-item" data-page="transactions">
+          <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/><path d="M17 15l3 3-3 3"/></svg>
+          Transactions
+        </a></li>
+        <li><a href="#" class="nav-item" data-page="analytics">
+          <svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M5 20V10l4-4 4 6 4-4v12"/></svg>
+          Analytics
+        </a></li>
+      </ul>
+      <div class="nav-footer">
+        <button id="themeToggle" class="icon-btn" title="Toggle theme">
+          <svg id="themeIconSun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <svg id="themeIconMoon" viewBox="0 0 24 24" class="hidden"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button id="exportBtn" class="icon-btn" title="Export data">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+        <label class="icon-btn" title="Import data">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10" transform="scale(1,-1) translate(0,-20)"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <input type="file" id="importFile" accept=".json" class="sr-only"/>
+        </label>
+      </div>
+    </nav>
+
+    <!-- MOBILE TOP BAR -->
+    <header id="topbar">
+      <button id="menuToggle" class="icon-btn">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span id="pageTitle">Dashboard</span>
+      <button id="addBtnMobile" class="icon-btn accent">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main id="main">
+      <!-- DASHBOARD PAGE -->
+      <section id="page-dashboard" class="page active">
+        <div class="page-header desktop-only">
+          <h1>Dashboard</h1>
+          <div class="page-header-right">
+            <span id="dashLastUpdated" class="muted-text"></span>
+          </div>
+        </div>
+
+        <!-- KPI CARDS -->
+        <div class="kpi-grid">
+          <div class="kpi-card accent-green">
+            <div class="kpi-label">Total Assets</div>
+            <div class="kpi-value" id="kpiTotalAssets">৳0.00</div>
+            <div class="kpi-sub" id="kpiAssetCount">0 funds</div>
+          </div>
+          <div class="kpi-card accent-blue">
+            <div class="kpi-label">Total Cash</div>
+            <div class="kpi-value" id="kpiTotalCash">৳0.00</div>
+            <div class="kpi-sub">Liquid</div>
+          </div>
+          <div class="kpi-card accent-purple">
+            <div class="kpi-label">Total Invested</div>
+            <div class="kpi-value" id="kpiTotalInvested">৳0.00</div>
+            <div class="kpi-sub">Portfolio</div>
+          </div>
+          <div class="kpi-card accent-orange">
+            <div class="kpi-label">Net Balance</div>
+            <div class="kpi-value" id="kpiNetBalance">৳0.00</div>
+            <div class="kpi-sub">Income − Expenses</div>
+          </div>
+        </div>
+
+        <!-- SUMMARY TABS -->
+        <div class="section-card">
+          <div class="card-header">
+            <h2>Summary</h2>
+            <div class="tab-pills">
+              <button class="tab-pill active" data-period="daily">Daily</button>
+              <button class="tab-pill" data-period="weekly">Weekly</button>
+              <button class="tab-pill" data-period="monthly">Monthly</button>
+            </div>
+          </div>
+          <div class="summary-grid" id="summaryGrid">
+            <div class="summary-item income">
+              <div class="summary-label">Income</div>
+              <div class="summary-value" id="summaryIncome">৳0.00</div>
+            </div>
+            <div class="summary-item expense">
+              <div class="summary-label">Expenses</div>
+              <div class="summary-value" id="summaryExpense">৳0.00</div>
+            </div>
+            <div class="summary-item savings">
+              <div class="summary-label">Net Savings</div>
+              <div class="summary-value" id="summarySavings">৳0.00</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FUNDS OVERVIEW -->
+        <div class="section-card">
+          <div class="card-header">
+            <h2>Funds Overview</h2>
+            <button class="text-btn" data-page="funds">See all →</button>
+          </div>
+          <div id="dashFundsList" class="funds-mini-list"></div>
+        </div>
+
+        <!-- RECENT TRANSACTIONS -->
+        <div class="section-card">
+          <div class="card-header">
+            <h2>Recent Transactions</h2>
+            <button class="text-btn" data-page="transactions">See all →</button>
+          </div>
+          <div id="dashRecentTx" class="tx-list"></div>
+        </div>
+      </section>
+
+      <!-- FUNDS PAGE -->
+      <section id="page-funds" class="page">
+        <div class="page-header">
+          <h1>Funds</h1>
+          <button class="btn btn-primary" id="addFundBtn">+ Add Fund</button>
+        </div>
+        <div class="section-card">
+          <div class="total-bar">
+            <span>Combined Total</span>
+            <span class="total-amount" id="fundsTotalAmount">৳0.00</span>
+          </div>
+          <div id="fundsList" class="funds-list"></div>
+        </div>
+      </section>
+
+      <!-- TRANSACTIONS PAGE -->
+      <section id="page-transactions" class="page">
+        <div class="page-header">
+          <h1>Transactions</h1>
+          <button class="btn btn-primary" id="addTxBtn">+ Add</button>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="section-card filters-card">
+          <div class="filter-row">
+            <input type="search" id="txSearch" placeholder="Search transactions…" class="input-field" />
+          </div>
+          <div class="filter-row">
+            <select id="filterCategory" class="input-field select-field">
+              <option value="">All Categories</option>
+            </select>
+            <select id="filterFund" class="input-field select-field">
+              <option value="">All Funds</option>
+            </select>
+            <select id="filterType" class="input-field select-field">
+              <option value="">All Types</option>
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
+          <div class="filter-row">
+            <label class="filter-label">From
+              <input type="date" id="filterDateFrom" class="input-field" />
+            </label>
+            <label class="filter-label">To
+              <input type="date" id="filterDateTo" class="input-field" />
+            </label>
+            <button id="clearFiltersBtn" class="btn btn-ghost">Clear</button>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div id="txList" class="tx-list"></div>
+          <div id="txEmpty" class="empty-state hidden">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+            <p>No transactions found</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANALYTICS PAGE -->
+      <section id="page-analytics" class="page">
+        <div class="page-header">
+          <h1>Analytics</h1>
+          <div class="tab-pills">
+            <button class="tab-pill active" data-analytics="monthly">Monthly</button>
+            <button class="tab-pill" data-analytics="weekly">Weekly</button>
+            <button class="tab-pill" data-analytics="daily">Daily</button>
+          </div>
+        </div>
+
+        <div class="analytics-grid">
+          <div class="section-card chart-card">
+            <h2>Income vs Expenses</h2>
+            <canvas id="chartIncomeExpense"></canvas>
+          </div>
+          <div class="section-card chart-card">
+            <h2>Savings Trend</h2>
+            <canvas id="chartSavings"></canvas>
+          </div>
+          <div class="section-card chart-card">
+            <h2>Spending by Category</h2>
+            <canvas id="chartCategory"></canvas>
+          </div>
+          <div class="section-card">
+            <h2>Period Summary</h2>
+            <div id="analyticsSummary" class="analytics-summary-list"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- OVERLAY -->
+  <div id="overlay" class="overlay hidden"></div>
+
+  <!-- MODAL: ADD/EDIT FUND -->
+  <div id="modalFund" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalFundTitle">Add Fund</h3>
+        <button class="icon-btn modal-close" data-modal="modalFund">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="fundId" />
+        <label class="form-label">Name *
+          <input type="text" id="fundName" class="input-field" placeholder="e.g. Cash, Bank, bKash" />
+        </label>
+        <label class="form-label">Type
+          <select id="fundType" class="input-field select-field">
+            <option value="cash">Cash</option>
+            <option value="bank">Bank Account</option>
+            <option value="mobile">Mobile Banking</option>
+            <option value="savings">Savings Account</option>
+            <option value="investment">Investment</option>
+            <option value="crypto">Crypto</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+        <label class="form-label">Balance *
+          <input type="number" id="fundBalance" class="input-field" placeholder="0.00" min="0" step="0.01" />
+        </label>
+        <label class="form-label">Note
+          <input type="text" id="fundNote" class="input-field" placeholder="Optional note" />
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost modal-close" data-modal="modalFund">Cancel</button>
+        <button class="btn btn-primary" id="saveFundBtn">Save Fund</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD/EDIT TRANSACTION -->
+  <div id="modalTx" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalTxTitle">Add Transaction</h3>
+        <button class="icon-btn modal-close" data-modal="modalTx">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="txId" />
+        <div class="type-toggle">
+          <button class="type-btn active" data-type="income">Income</button>
+          <button class="type-btn" data-type="expense">Expense</button>
+        </div>
+        <label class="form-label">Amount *
+          <input type="number" id="txAmount" class="input-field" placeholder="0.00" min="0.01" step="0.01" />
+        </label>
+        <label class="form-label">Category *
+          <input type="text" id="txCategory" class="input-field" placeholder="e.g. Salary, Food, Rent" list="categoryList" />
+          <datalist id="categoryList"></datalist>
+        </label>
+        <label class="form-label">Fund *
+          <select id="txFund" class="input-field select-field">
+            <option value="">Select a fund…</option>
+          </select>
+        </label>
+        <label class="form-label">Date *
+          <input type="date" id="txDate" class="input-field" />
+        </label>
+        <label class="form-label">Note
+          <textarea id="txNote" class="input-field" rows="2" placeholder="Optional note"></textarea>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost modal-close" data-modal="modalTx">Cancel</button>
+        <button class="btn btn-primary" id="saveTxBtn">Save Transaction</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRM DELETE -->
+  <div id="modalConfirm" class="modal hidden">
+    <div class="modal-box modal-box-sm">
+      <div class="modal-header">
+        <h3>Confirm Delete</h3>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMessage">Are you sure you want to delete this item?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost modal-close" data-modal="modalConfirm">Cancel</button>
+        <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toastContainer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
