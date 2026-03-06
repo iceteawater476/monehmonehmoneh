@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<meta name="description" content="MoneyFlow – Personal savings & money tracker"/>
+<meta name="description" content="OreTeka – Personal savings & money tracker"/>
 <meta name="theme-color" content="#0e1118"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-title" content="MoneyFlow"/>
-<title>MoneyFlow</title>
+<meta name="apple-mobile-web-app-title" content="OreTeka"/>
+<title>OreTeka — আমার টাকা</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap');
 :root{--f:'DM Sans',system-ui,sans-serif;--fm:'DM Mono',monospace;--sw:220px;--th:56px;--r:14px;--rs:8px;--rx:5px;--ease:cubic-bezier(.4,0,.2,1);--tf:150ms var(--ease);--tm:250ms var(--ease);--ts:400ms var(--ease)}
@@ -263,9 +263,9 @@ textarea.input-field{resize:vertical;min-height:68px}
     <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
       <rect width="48" height="48" rx="13" fill="url(#sg)"/>
       <path d="M14 28c0-3.3 2.7-6 6-6h8c1.1 0 2-.9 2-2s-.9-2-2-2H18v-4h4v-2h4v2h2c3.3 0 6 2.7 6 6s-2.7 6-6 6h-8c-1.1 0-2 .9-2 2s.9 2 2 2h10v4h-4v2h-4v-2h-2c-3.3 0-6-2.7-6-6z" fill="white"/>
-      <defs><linearGradient id="sg" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#6ee7b7"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
+      <defs><linearGradient id="sg" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#f59e0b"/><stop offset="1" stop-color="#10b981"/></linearGradient></defs>
     </svg>
-    <span>MoneyFlow</span>
+    <span>OreTeka</span><span style="font-size:.55em;font-weight:400;color:#10b981;letter-spacing:.5px;margin-left:2px">আমার টাকা</span>
   </div>
 </div>
 
@@ -276,9 +276,9 @@ textarea.input-field{resize:vertical;min-height:68px}
       <svg width="30" height="30" viewBox="0 0 48 48" fill="none">
         <rect width="48" height="48" rx="12" fill="url(#sg3)"/>
         <path d="M14 28c0-3.3 2.7-6 6-6h8c1.1 0 2-.9 2-2s-.9-2-2-2H18v-4h4v-2h4v2h2c3.3 0 6 2.7 6 6s-2.7 6-6 6h-8c-1.1 0-2 .9-2 2s.9 2 2 2h10v4h-4v2h-4v-2h-2c-3.3 0-6-2.7-6-6z" fill="white"/>
-        <defs><linearGradient id="sg3" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#6ee7b7"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
+        <defs><linearGradient id="sg3" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#f59e0b"/><stop offset="1" stop-color="#10b981"/></linearGradient></defs>
       </svg>
-      MoneyFlow
+      OreTeka
     </div>
     <ul class="nav-links">
       <li><a href="#" class="nav-item active" data-page="dashboard">
@@ -592,7 +592,7 @@ textarea.input-field{resize:vertical;min-height:68px}
 
 <script>
 'use strict';
-const DB_NAME='moneyflow_db',DB_VER=1,CUR='৳';
+const DB_NAME='oreteka_db',DB_VER=1,CUR='৳';
 const FT={cash:{l:'Cash',e:'💵'},bank:{l:'Bank Account',e:'🏦'},mobile:{l:'Mobile Banking',e:'📱'},savings:{l:'Savings',e:'🐖'},investment:{l:'Investment',e:'📈'},crypto:{l:'Crypto',e:'₿'},other:{l:'Other',e:'💼'}};
 const CAT_PRESET=['Salary','Freelance','Business','Bonus','Gift','Investment Return','Food','Rent','Transport','Utilities','Shopping','Healthcare','Education','Entertainment','Travel','Clothing','Savings Transfer','Other'];
 
@@ -890,7 +890,7 @@ function exportCsv(){
     rows.push([t.id,t.type,t.amount,t.category,fn,t.date,t.note||'']);
   }
   const csv=rows.map(r=>r.map(escapeCsvField).join(',')).join('\n');
-  dlBlob(csv,'text/csv',`moneyflow-transactions-${today()}.csv`);
+  dlBlob(csv,'text/csv',`oreteka-transactions-${today()}.csv`);
   toast(`Exported ${S.transactions.length} transactions`);
 }
 function exportFundsCsv(){
@@ -898,7 +898,7 @@ function exportFundsCsv(){
   const rows=[['id','name','type','balance','note']];
   for(const f of S.funds)rows.push([f.id,f.name,f.type,f.balance,f.note||'']);
   const csv=rows.map(r=>r.map(escapeCsvField).join(',')).join('\n');
-  dlBlob(csv,'text/csv',`moneyflow-funds-${today()}.csv`);
+  dlBlob(csv,'text/csv',`oreteka-funds-${today()}.csv`);
   toast(`Exported ${S.funds.length} funds`);
 }
 function dlBlob(content,mime,filename){
@@ -964,8 +964,8 @@ async function importFundsCsv(file){
 /* ===== SCAN / GEMINI AI ===== */
 let scanImgOriginal=null;
 let scanImgDataUrl=null;
-const SCAN_HISTORY_KEY='mf_scan_history';
-const GEMINI_KEY_STORAGE='mf_gemini_key';
+const SCAN_HISTORY_KEY='ot_scan_history';
+const GEMINI_KEY_STORAGE='ot_gemini_key';
 
 function getGeminiKey(){return localStorage.getItem(GEMINI_KEY_STORAGE)||'';}
 function saveGeminiKey(k){localStorage.setItem(GEMINI_KEY_STORAGE,k.trim());}
@@ -1290,7 +1290,7 @@ async function init(){
     renderScanHistory();
     initApiKeyUI();
   }catch(err){
-    console.error('[MoneyFlow]',err);
+    console.error('[OreTeka]',err);
     const sl=document.querySelector('.splash-logo');
     if(sl)sl.innerHTML+=`<div style="font-size:.7rem;color:#f87171;margin-top:8px">Error: ${err.message}</div>`;
   }finally{
@@ -1307,3 +1307,4 @@ document.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
 </html>
+
