@@ -442,7 +442,7 @@ textarea.input-field{resize:vertical;min-height:68px}
     <section id="page-scan" class="page">
       <div class="page-header">
         <h1>Scan Receipt / Note</h1>
-        <span class="muted-text">Powered by Gemini AI — requires internet</span>
+        <span class="muted-text">Powered by Gemini 2.5 Flash — requires internet</span>
       </div>
 
       <div class="scan-tip">
@@ -1054,10 +1054,10 @@ Example output:
 
   try{
     el('ocrBar').style.width='40%';
-    el('ocrSubStatus').textContent='Processing with Gemini 1.5 Flash…';
+    el('ocrSubStatus').textContent='Processing with Gemini 2.5 Flash…';
 
     const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method:'POST',
         headers:{'Content-Type':'application/json'},
