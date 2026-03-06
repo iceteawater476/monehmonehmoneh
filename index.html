@@ -8,7 +8,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="MoneyFlow"/>
 <title>MoneyFlow</title>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap');
 :root{--f:'DM Sans',system-ui,sans-serif;--fm:'DM Mono',monospace;--sw:220px;--th:56px;--r:14px;--rs:8px;--rx:5px;--ease:cubic-bezier(.4,0,.2,1);--tf:150ms var(--ease);--tm:250ms var(--ease);--ts:400ms var(--ease)}
@@ -443,11 +442,28 @@ textarea.input-field{resize:vertical;min-height:68px}
     <section id="page-scan" class="page">
       <div class="page-header">
         <h1>Scan Receipt / Note</h1>
-        <span class="muted-text">Powered by Tesseract.js — 100% offline</span>
+        <span class="muted-text">Powered by Gemini AI — requires internet</span>
       </div>
 
       <div class="scan-tip">
-        <strong>✍️ Handwriting tips for best results:</strong> Use dark pen on white/light paper · Write amounts clearly with a decimal point (e.g. <strong>Food 250.00</strong>) · One item per line · Good lighting, minimal shadow · Works best with printed + block handwriting
+        <strong>✍️ Tips for best results:</strong> Use dark pen on white/light paper · Write one item per line with amount (e.g. <strong>Food 250</strong> or <strong>Rent 8000</strong>) · Good lighting helps · Gemini AI can read messy handwriting, receipts, and mixed text · Requires internet connection
+      </div>
+
+      <!-- API KEY SETUP -->
+      <div id="apiKeySetupBox" class="section-card" style="margin-bottom:16px">
+        <div class="card-header">
+          <h2>🔑 Gemini API Key</h2>
+          <span id="apiKeyStatus" class="muted-text">Not set</span>
+        </div>
+        <p style="font-size:.81rem;color:var(--tx3);margin-bottom:12px;line-height:1.6">
+          Get a <strong style="color:var(--tx2)">free</strong> API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--b)">Google AI Studio</a> — no credit card needed. Free tier: 15 requests/min, 1500/day.
+        </p>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="password" id="geminiApiKeyInput" class="input-field" placeholder="Paste your Gemini API key here…" style="flex:1;min-width:200px"/>
+          <button class="btn btn-primary" id="saveApiKeyBtn">Save Key</button>
+          <button class="btn btn-ghost btn-sm" id="clearApiKeyBtn" style="display:none">Clear</button>
+        </div>
+        <p style="font-size:.73rem;color:var(--tx3);margin-top:8px">🔒 Stored in your browser only — never sent anywhere except Google's API.</p>
       </div>
 
       <div class="scan-hero">
@@ -464,46 +480,16 @@ textarea.input-field{resize:vertical;min-height:68px}
             <div class="preview-placeholder">Image preview will appear here</div>
           </div>
           <div class="preview-bottom" id="previewBottom" style="display:none">
-            <button class="btn btn-primary btn-sm" id="runOcrBtn">🔍 Run OCR</button>
+            <button class="btn btn-primary btn-sm" id="runOcrBtn">✨ Analyze with AI</button>
             <button class="btn btn-ghost btn-sm" id="clearScanBtn">Clear</button>
           </div>
         </div>
       </div>
 
-      <!-- Preprocessing controls -->
-      <div class="preprocess-panel" id="preprocessPanel" style="display:none">
-        <div class="preprocess-title">
-          Image Pre-processing
-          <span class="badge">Improves handwriting accuracy</span>
-          <button class="btn btn-ghost btn-sm" id="applyPreprocessBtn" style="margin-left:auto">Apply & Preview</button>
-        </div>
-        <div class="sliders-grid">
-          <div class="slider-row">
-            <div class="slider-lbl">Brightness <span id="brightnessVal">0</span></div>
-            <input type="range" id="sliderBrightness" min="-100" max="100" value="0"/>
-          </div>
-          <div class="slider-row">
-            <div class="slider-lbl">Contrast <span id="contrastVal">0</span></div>
-            <input type="range" id="sliderContrast" min="-100" max="100" value="0"/>
-          </div>
-          <div class="slider-row">
-            <div class="slider-lbl">Threshold (B&W) <span id="thresholdVal">128</span></div>
-            <input type="range" id="sliderThreshold" min="80" max="220" value="128"/>
-          </div>
-          <div class="slider-row">
-            <div class="slider-lbl">Sharpen <span id="sharpenVal">0</span></div>
-            <input type="range" id="sliderSharpen" min="0" max="3" step="0.5" value="0"/>
-          </div>
-        </div>
-        <div class="canvas-preview-row">
-          <div class="canvas-preview-item"><canvas id="cvOriginal"></canvas><p>Original</p></div>
-          <div class="canvas-preview-item"><canvas id="cvProcessed"></canvas><p>Processed (used for OCR)</p></div>
-        </div>
-      </div>
 
       <!-- OCR progress -->
       <div id="ocrProgressBox" class="ocr-progress-box" style="display:none">
-        <div class="ocr-status" id="ocrStatus">Initializing OCR engine…</div>
+        <div class="ocr-status" id="ocrStatus">Sending to Gemini AI…</div>
         <div class="ocr-bar-wrap"><div class="ocr-bar" id="ocrBar"></div></div>
         <div class="ocr-status" id="ocrSubStatus" style="margin-top:4px;font-size:.73rem"></div>
       </div>
@@ -670,7 +656,7 @@ function nav(page){
   if(page==='funds')renderFunds();
   if(page==='transactions')renderTxs();
   if(page==='analytics')renderAnalytics();
-  if(page==='scan'){fillScanFundSel();el('scanDate').value=today();}
+  if(page==='scan'){fillScanFundSel();el('scanDate').value=today();initApiKeyUI();renderScanHistory();}
   closeSidebar();
 }
 function openSidebar(){el('sidebar').classList.add('open');el('sidebarOverlay').classList.add('on');}
@@ -975,9 +961,24 @@ async function importFundsCsv(file){
   }catch(e){toast('Funds CSV import failed: '+e.message,'error');}
 }
 
-/* ===== SCAN / OCR ===== */
-let scanImgOriginal=null; // original HTMLImageElement
+/* ===== SCAN / GEMINI AI ===== */
+let scanImgOriginal=null;
+let scanImgDataUrl=null;
 const SCAN_HISTORY_KEY='mf_scan_history';
+const GEMINI_KEY_STORAGE='mf_gemini_key';
+
+function getGeminiKey(){return localStorage.getItem(GEMINI_KEY_STORAGE)||'';}
+function saveGeminiKey(k){localStorage.setItem(GEMINI_KEY_STORAGE,k.trim());}
+
+function initApiKeyUI(){
+  const k=getGeminiKey();
+  if(k){
+    el('geminiApiKeyInput').value=k;
+    el('apiKeyStatus').textContent='✅ Key saved';
+    el('apiKeyStatus').style.color='var(--g)';
+    el('clearApiKeyBtn').style.display='inline-flex';
+  }
+}
 
 function fillScanFundSel(){
   const sel=el('scanDefaultFund');
@@ -992,13 +993,12 @@ function loadScanImage(file){
     const img=new Image();
     img.onload=()=>{
       scanImgOriginal=img;
-      el('previewTop').innerHTML=`<img src="${e.target.result}" alt="Preview"/><button class="remove-img" id="removeImgBtn">✕</button>`;
+      scanImgDataUrl=e.target.result;
+      el('previewTop').innerHTML=`<img src="${e.target.result}" alt="Preview" style="max-width:100%;max-height:280px;display:block;object-fit:contain"/><button class="remove-img" id="removeImgBtn">✕</button>`;
       el('previewBottom').style.display='flex';
-      el('preprocessPanel').style.display='block';
       el('ocrProgressBox').style.display='none';
       el('rawTextSection').style.display='none';
       el('parsedSection').style.display='none';
-      drawCanvasPreviews();
       el('removeImgBtn').onclick=clearScan;
     };
     img.src=e.target.result;
@@ -1007,161 +1007,132 @@ function loadScanImage(file){
 }
 
 function clearScan(){
-  scanImgOriginal=null;
+  scanImgOriginal=null;scanImgDataUrl=null;
   el('previewTop').innerHTML='<div class="preview-placeholder">Image preview will appear here</div>';
   el('previewBottom').style.display='none';
-  el('preprocessPanel').style.display='none';
   el('ocrProgressBox').style.display='none';
   el('rawTextSection').style.display='none';
   el('parsedSection').style.display='none';
   el('scanFileInput').value='';
 }
 
-/* ===== IMAGE PRE-PROCESSING ===== */
-function drawCanvasPreviews(){
-  if(!scanImgOriginal)return;
-  const orig=el('cvOriginal'),proc=el('cvProcessed');
-  const maxW=280,scale=Math.min(1,maxW/scanImgOriginal.width);
-  const w=Math.round(scanImgOriginal.width*scale),h=Math.round(scanImgOriginal.height*scale);
-  orig.width=proc.width=w;orig.height=proc.height=h;
-  const octx=orig.getContext('2d');octx.drawImage(scanImgOriginal,0,0,w,h);
-  applyPreprocessToCanvas(proc,w,h);
-}
-
-function applyPreprocessToCanvas(targetCanvas,w,h){
-  if(!scanImgOriginal)return;
-  const tmpC=document.createElement('canvas');tmpC.width=w;tmpC.height=h;
-  const ctx=tmpC.getContext('2d');
-  ctx.drawImage(scanImgOriginal,0,0,w,h);
-  const brightness=parseInt(el('sliderBrightness').value);
-  const contrast=parseInt(el('sliderContrast').value);
-  const threshold=parseInt(el('sliderThreshold').value);
-  const sharpen=parseFloat(el('sliderSharpen').value);
-  let imgData=ctx.getImageData(0,0,w,h);
-  let d=imgData.data;
-
-  // Sharpen via unsharp mask
-  if(sharpen>0){
-    const blurred=gaussianBlur(d,w,h,1.2);
-    for(let i=0;i<d.length;i+=4){
-      for(let c=0;c<3;c++){d[i+c]=clamp(d[i+c]+sharpen*(d[i+c]-blurred[i+c]));}
-    }
-  }
-  // Greyscale
-  for(let i=0;i<d.length;i+=4){
-    const g=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
-    d[i]=d[i+1]=d[i+2]=g;
-  }
-  // Brightness + Contrast
-  const factor=(259*(contrast+255))/(255*(259-contrast));
-  for(let i=0;i<d.length;i+=4){
-    for(let c=0;c<3;c++){d[i+c]=clamp(factor*(d[i+c]-128)+128+brightness);}
-  }
-  // Binary threshold (helps handwriting)
-  for(let i=0;i<d.length;i+=4){
-    const v=d[i]<threshold?0:255;d[i]=d[i+1]=d[i+2]=v;
-  }
-  ctx.putImageData(imgData,0,0);
-  const tctx=targetCanvas.getContext('2d');tctx.drawImage(tmpC,0,0);
-  return tmpC;
-}
-
-function gaussianBlur(data,w,h,radius){
-  const out=new Uint8ClampedArray(data);
-  const r=Math.ceil(radius),sz=2*r+1;
-  const kernel=[];let sum=0;
-  for(let i=-r;i<=r;i++){const v=Math.exp(-(i*i)/(2*radius*radius));kernel.push(v);sum+=v;}
-  kernel.forEach((_,i,a)=>a[i]/=sum);
-  for(let y=0;y<h;y++){for(let x=0;x<w;x++){let s=0,wt=0;for(let k=-r;k<=r;k++){const nx=Math.min(Math.max(x+k,0),w-1);const idx=(y*w+nx)*4;s+=data[idx]*kernel[k+r];wt+=kernel[k+r];}const i=(y*w+x)*4;out[i]=out[i+1]=out[i+2]=s/wt;}}
-  return out;
-}
-function clamp(v){return Math.max(0,Math.min(255,Math.round(v)));}
-
-/* ===== OCR ===== */
+/* ===== GEMINI AI CALL ===== */
 async function runOcr(){
-  if(!scanImgOriginal){toast('Upload an image first','warn');return;}
+  const apiKey=getGeminiKey();
+  if(!apiKey){toast('Please enter your Gemini API key first','error');el('geminiApiKeyInput').focus();return;}
+  if(!scanImgDataUrl){toast('Upload an image first','warn');return;}
+
   el('ocrProgressBox').style.display='block';
   el('rawTextSection').style.display='none';
   el('parsedSection').style.display='none';
-  el('ocrStatus').textContent='Preparing image…';
-  el('ocrBar').style.width='5%';
+  el('ocrStatus').textContent='Sending image to Gemini AI…';
+  el('ocrBar').style.width='20%';
+  el('ocrSubStatus').textContent='';
   el('runOcrBtn').disabled=true;
 
-  // Build processed image for OCR
-  const procC=document.createElement('canvas');
-  const scale=Math.min(1,1200/Math.max(scanImgOriginal.width,scanImgOriginal.height));
-  procC.width=Math.round(scanImgOriginal.width*scale);
-  procC.height=Math.round(scanImgOriginal.height*scale);
-  applyPreprocessToCanvas(procC,procC.width,procC.height);
+  // Extract base64 data and mime type from data URL
+  const [meta, b64data] = scanImgDataUrl.split(',');
+  const mimeType = meta.match(/:(.*?);/)[1];
+
+  const prompt = `You are a personal finance assistant. Analyze this image which may contain a handwritten or printed expense/income list, receipt, or bill.
+
+Extract ALL financial transactions you can see. For each item return a JSON array with objects having these exact fields:
+- "category": string (what was bought/earned, e.g. "Food", "Transport", "Salary")
+- "amount": number (positive, no currency symbols)
+- "type": "expense" or "income"
+- "note": string (any extra detail, or empty string)
+
+Rules:
+- If amount is ambiguous, make your best guess
+- Default type to "expense" unless it clearly looks like income (salary, received, earned, etc.)
+- Clean up category names: capitalize first letter, remove special chars
+- Skip header lines, dates, totals, tax lines, and store names
+- Return ONLY a valid JSON array, no explanation, no markdown, no code fences
+
+Example output:
+[{"category":"Food","amount":250,"type":"expense","note":""},{"category":"Transport","amount":50,"type":"expense","note":"rickshaw"}]`;
 
   try{
-    const worker=await Tesseract.createWorker('eng',Tesseract.OEM.LSTM_ONLY,{
-      logger:m=>{
-        el('ocrSubStatus').textContent=m.status;
-        if(m.progress){el('ocrBar').style.width=Math.round(m.progress*100)+'%';}
-      },
-      // LSTM PSM 6 = assume uniform block of text (best for receipts/notes)
-    });
-    await worker.setParameters({
-      tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
-      // These params improve handwriting recognition
-      tessedit_char_whitelist:'',
-      preserve_interword_spaces:'1',
-    });
-    el('ocrStatus').textContent='Running OCR (LSTM engine)…';
-    const {data:{text}}=await worker.recognize(procC);
-    await worker.terminate();
+    el('ocrBar').style.width='40%';
+    el('ocrSubStatus').textContent='Processing with Gemini 1.5 Flash…';
+
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          contents:[{parts:[
+            {inline_data:{mime_type:mimeType,data:b64data}},
+            {text:prompt}
+          ]}],
+          generationConfig:{temperature:0.1,maxOutputTokens:2048}
+        })
+      }
+    );
+
+    el('ocrBar').style.width='80%';
+
+    if(!resp.ok){
+      const err=await resp.json();
+      throw new Error(err.error?.message||`HTTP ${resp.status}`);
+    }
+
+    const data=await resp.json();
+    const rawText=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+
     el('ocrBar').style.width='100%';
-    el('ocrStatus').textContent='Done!';
+    el('ocrStatus').textContent='Done! ✨';
     setTimeout(()=>el('ocrProgressBox').style.display='none',1200);
 
-    const cleanText=text.trim();
-    el('rawTextBox').textContent=cleanText||'(No text detected)';
+    // Show raw AI response
+    el('rawTextBox').textContent=rawText;
     el('rawTextSection').style.display='block';
 
-    const parsed=parseOcrText(cleanText);
-    renderParsedEntries(parsed);
-    saveScanHistory(parsed,cleanText);
+    // Parse JSON from response
+    const entries=parseGeminiResponse(rawText);
+    renderParsedEntries(entries);
+    saveScanHistory(entries,rawText);
+
   }catch(err){
-    el('ocrStatus').textContent='OCR failed: '+err.message;
-    toast('OCR error: '+err.message,'error');
+    el('ocrStatus').textContent='Error: '+err.message;
+    el('ocrBar').style.background='var(--red)';
+    toast('Gemini error: '+err.message,'error');
+    setTimeout(()=>{el('ocrBar').style.background='';},2000);
   }
   el('runOcrBtn').disabled=false;
 }
 
-/* ===== SMART OCR TEXT PARSER ===== */
-// Handles handwritten patterns like:
-// "Food 250", "Food - 250.00", "food: 250", "250 food", "Lunch 50tk", etc.
-function parseOcrText(text){
-  const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>1);
-  const entries=[];
-
-  // currency/number patterns: 250, 250.00, ৳250, 250tk, 250/-
-  const numRx=/(?:৳|BDT|tk|taka|Rs\.?|₹|\$)?[\s]*([\d,]+(?:\.\d{1,2})?)\s*(?:tk|taka|BDT|৳|-\/\-)?/i;
-  // income keywords
-  const incomeKw=/\b(salary|income|received|got|earn|bonus|cashback|refund|deposit|credit|payment received|sell|sold)\b/i;
-  // noise lines to skip
-  const skipRx=/^(date|total|subtotal|grand total|tax|vat|receipt|invoice|bill|change|cash|thank|page|printed|time:|tel:|phone|address|www\.|http)/i;
-
-  for(const line of lines){
-    if(skipRx.test(line))continue;
-    const numMatch=line.match(numRx);
-    if(!numMatch)continue;
-    const amount=parseFloat(numMatch[1].replace(/,/g,''));
-    if(isNaN(amount)||amount<=0||amount>9999999)continue;
-
-    // Extract category: everything that's NOT the number portion
-    let cat=line.replace(numMatch[0],'').replace(/[-:_|]/g,' ').replace(/\s+/g,' ').trim();
-    // Remove noise chars
-    cat=cat.replace(/[^\w\s\u0980-\u09FF]/g,'').trim();
-    if(!cat||cat.length<1)cat='Misc';
-    // Capitalize first letter
-    cat=cat.charAt(0).toUpperCase()+cat.slice(1).toLowerCase();
-
-    const type=incomeKw.test(line)?'income':'expense';
-    entries.push({cat,amount,type,include:true,note:''});
+function parseGeminiResponse(text){
+  // Strip markdown code fences if present
+  let cleaned=text.trim().replace(/^```(?:json)?\n?/,'').replace(/\n?```$/,'').trim();
+  // Find JSON array
+  const start=cleaned.indexOf('[');
+  const end=cleaned.lastIndexOf(']');
+  if(start===-1||end===-1)return [];
+  try{
+    const arr=JSON.parse(cleaned.slice(start,end+1));
+    return arr.filter(e=>e&&typeof e.amount==='number'&&e.amount>0&&e.category)
+              .map(e=>({
+                cat:String(e.category).trim(),
+                amount:Number(e.amount),
+                type:e.type==='income'?'income':'expense',
+                note:String(e.note||'').trim(),
+                include:true
+              }));
+  }catch(err){
+    // Try to extract individual objects if array parse fails
+    const objects=[];
+    const objRx=/\{[^{}]+\}/g;
+    let m;
+    while((m=objRx.exec(cleaned))!==null){
+      try{
+        const o=JSON.parse(m[0]);
+        if(o.amount&&o.category)objects.push({cat:o.category,amount:Number(o.amount),type:o.type==='income'?'income':'expense',note:o.note||'',include:true});
+      }catch(e){}
+    }
+    return objects;
   }
-  return entries;
 }
 
 let parsedData=[];
@@ -1169,7 +1140,7 @@ function renderParsedEntries(entries){
   parsedData=entries.map((e,i)=>({...e,id:i}));
   if(parsedData.length===0){
     el('parsedSection').style.display='none';
-    toast('No transactions found in image. Try adjusting pre-processing settings.','warn');
+    toast('No transactions found. Try a clearer photo or check the raw AI response.','warn');
     return;
   }
   el('parsedCount').textContent=`${parsedData.length} found`;
@@ -1202,8 +1173,8 @@ window.peUpdate=(i,k,v)=>{if(parsedData[i]){parsedData[i][k]=k==='amount'?parseF
 window.peToggle=(i)=>{if(parsedData[i])parsedData[i].include=!parsedData[i].include;renderParsedList();};
 window.peRemove=(i)=>{parsedData.splice(i,1);renderParsedList();el('parsedCount').textContent=`${parsedData.length} found`;};
 
-async function importParsedEntries(onlyChecked){
-  const toImport=parsedData.filter(e=>e.include||(onlyChecked&&e.include));
+async function importParsedEntries(){
+  const toImport=parsedData.filter(e=>e.include);
   const fundId=parseInt(el('scanDefaultFund').value);
   const date=el('scanDate').value||today();
   if(!fundId){toast('Please select a fund','error');return;}
@@ -1211,8 +1182,9 @@ async function importParsedEntries(onlyChecked){
   let count=0;
   for(const e of toImport){
     const amt=Number(e.amount);if(isNaN(amt)||amt<=0)continue;
-    const tx={type:e.type,amount:amt,category:e.cat,fundId,date,note:e.note||'via Scan',createdAt:new Date().toISOString()};
+    const tx={type:e.type,amount:amt,category:e.cat,fundId,date,note:e.note||'via AI Scan',createdAt:new Date().toISOString()};
     await da('transactions',tx);
+    await loadAll();
     const fund=S.funds.find(f=>f.id===fundId);
     if(fund){let b=Number(fund.balance);b+=e.type==='income'?amt:-amt;await dp('funds',{...fund,balance:Math.max(0,b)});}
     count++;
@@ -1234,15 +1206,14 @@ function addManualEntry(){
 /* ===== SCAN HISTORY ===== */
 function saveScanHistory(entries,rawText){
   let h=[];try{h=JSON.parse(localStorage.getItem(SCAN_HISTORY_KEY)||'[]');}catch(e){}
-  h.unshift({date:today(),time:new Date().toLocaleTimeString(),count:entries.length,rawText:rawText.slice(0,200),total:entries.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0)});
-  h=h.slice(0,10);
-  localStorage.setItem(SCAN_HISTORY_KEY,JSON.stringify(h));
+  h.unshift({date:today(),time:new Date().toLocaleTimeString(),count:entries.length,total:entries.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0)});
+  h=h.slice(0,10);localStorage.setItem(SCAN_HISTORY_KEY,JSON.stringify(h));
   renderScanHistory();
 }
 function renderScanHistory(){
   let h=[];try{h=JSON.parse(localStorage.getItem(SCAN_HISTORY_KEY)||'[]');}catch(e){}
   el('scanHistoryList').innerHTML=h.length===0?'<div style="color:var(--tx3);font-size:.82rem;padding:8px 0">No scans yet.</div>':
-    h.map(s=>`<div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--bg3);border-radius:var(--rs);margin-bottom:7px"><div style="flex:1"><div style="font-size:.75rem;color:var(--tx3)">${s.date} · ${s.time}</div><div style="font-size:.83rem;color:var(--tx2);margin-top:2px">${s.count} item${s.count!==1?'s':''} detected</div></div><div style="font-family:var(--fm);font-weight:700;font-size:.88rem;color:var(--red)">${fmt(s.total)}</div></div>`).join('');
+    h.map(s=>`<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg3);border-radius:var(--rs);margin-bottom:7px"><div style="flex:1"><div style="font-size:.75rem;color:var(--tx3)">${s.date} · ${s.time}</div><div style="font-size:.83rem;color:var(--tx2);margin-top:2px">${s.count} item${s.count!==1?'s':''} detected</div></div><div style="font-family:var(--fm);font-weight:700;font-size:.88rem;color:var(--red)">${fmt(s.total)}</div></div>`).join('');
 }
 function clearScanHistory(){localStorage.removeItem(SCAN_HISTORY_KEY);renderScanHistory();}
 
@@ -1280,19 +1251,28 @@ function bindEvents(){
   dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');if(e.dataTransfer.files[0])loadScanImage(e.dataTransfer.files[0]);});
   el('runOcrBtn').addEventListener('click',runOcr);
   el('clearScanBtn').addEventListener('click',clearScan);
-  el('applyPreprocessBtn').addEventListener('click',drawCanvasPreviews);
   el('toggleRawBtn').addEventListener('click',()=>{const b=el('rawTextBox');b.style.display=b.style.display==='none'?'block':'none';el('toggleRawBtn').textContent=b.style.display==='none'?'Show':'Hide';});
-  el('importAllParsedBtn').addEventListener('click',()=>importParsedEntries(false));
-  el('importCheckedBtn').addEventListener('click',()=>importParsedEntries(true));
+  el('importAllParsedBtn').addEventListener('click',importParsedEntries);
+  el('importCheckedBtn').addEventListener('click',importParsedEntries);
   el('addManualEntryBtn').addEventListener('click',addManualEntry);
-  el('clearScanBtn').addEventListener('click',clearScan);
   el('clearScanHistoryBtn').addEventListener('click',clearScanHistory);
-  ['sliderBrightness','sliderContrast','sliderThreshold','sliderSharpen'].forEach(id=>{
-    el(id).addEventListener('input',()=>{
-      const v=el(id).value;
-      const lbl=id.replace('slider','').toLowerCase();
-      el(lbl+'Val').textContent=v;
-    });
+  // API key
+  el('saveApiKeyBtn').addEventListener('click',()=>{
+    const k=el('geminiApiKeyInput').value.trim();
+    if(!k){toast('Please enter an API key','error');return;}
+    saveGeminiKey(k);
+    el('apiKeyStatus').textContent='✅ Key saved';
+    el('apiKeyStatus').style.color='var(--g)';
+    el('clearApiKeyBtn').style.display='inline-flex';
+    toast('API key saved!');
+  });
+  el('clearApiKeyBtn').addEventListener('click',()=>{
+    localStorage.removeItem(GEMINI_KEY_STORAGE);
+    el('geminiApiKeyInput').value='';
+    el('apiKeyStatus').textContent='Not set';
+    el('apiKeyStatus').style.color='';
+    el('clearApiKeyBtn').style.display='none';
+    toast('API key cleared','info');
   });
   let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(document.querySelector('#page-analytics.active'))renderAnalytics();},150);});
 }
@@ -1308,6 +1288,7 @@ async function init(){
     bindEvents();
     renderDash();
     renderScanHistory();
+    initApiKeyUI();
   }catch(err){
     console.error('[MoneyFlow]',err);
     const sl=document.querySelector('.splash-logo');
@@ -1326,4 +1307,3 @@ document.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
 </html>
-
